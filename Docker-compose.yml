@@ -1,0 +1,4 @@
+services:
+  catalog:
+    build:
+      context: ./catalog
