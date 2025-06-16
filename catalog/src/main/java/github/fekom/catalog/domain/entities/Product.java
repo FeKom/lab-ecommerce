@@ -3,6 +3,7 @@ package github.fekom.catalog.domain.entities;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,8 +13,8 @@ public record Product(String id,
                       String name,
                       BigDecimal price,
                       int stock,
-                      Instant createAt,
-                      Instant updateAt,
+                      LocalDateTime createAt,
+                      LocalDateTime updateAt,
                       List<String> tags,
                       Optional<String> category,
                       Optional<String> description) {
@@ -31,7 +32,7 @@ public record Product(String id,
         if(stock < 0) {
             throw new IllegalArgumentException("Stock must be greater than zero");
         }
-        return new Product(UUID.randomUUID().toString(), name, price, stock, Instant.now(), Instant.now(), tags, category, description);
+        return new Product(UUID.randomUUID().toString(), name, price, stock, LocalDateTime.now(), LocalDateTime.now(), tags, category, description);
     }
 
 }
