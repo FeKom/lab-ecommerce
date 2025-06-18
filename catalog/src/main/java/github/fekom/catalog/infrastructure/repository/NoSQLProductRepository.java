@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Repository
 public class NoSQLProductRepository implements ProductRepository {
@@ -67,5 +67,14 @@ public class NoSQLProductRepository implements ProductRepository {
         var persistence = github.fekom.catalog.infrastructure.persistence.Product.class;
 
         mongoTemplate.updateFirst(query, update, persistence);
+    }
+
+    @Override
+    public Optional<Product> findById(String id) {
+        github.fekom.catalog.infrastructure.persistence.Product persistenceProduct =
+                mongoTemplate.findById(id, github.fekom.catalog.infrastructure.persistence.Product.class);
+
+        return Optional.ofNullable(persistenceProduct)
+                .map(github.fekom.catalog.infrastructure.persistence.Product::toDomain);
     }
 }
