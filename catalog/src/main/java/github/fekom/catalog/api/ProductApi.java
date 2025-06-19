@@ -25,7 +25,7 @@ public class ProductApi {
                                     Optional<String> category, Optional<String> description) {
 
         var newProduct = Product.create(name, price, stock, tags, category,description);
-        productRepository.saveOne(Collections.singletonList(newProduct));
+        productRepository.save(Collections.singletonList(newProduct));
         return newProduct;
     }
 
