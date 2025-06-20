@@ -25,13 +25,13 @@ class NoSQLProductRepositoryTest extends ProductRepositoryTest {
     @Autowired
     NoSQLProductRepository repository;
 
-//    @Container
-//    static MongoDBContainer mongo = new MongoDBContainer("mongo:latest");
-//
-//    @DynamicPropertySource
-//    static void mongoProperties(DynamicPropertyRegistry registry) {
-//        registry.add("spring.data.mongodb.uri", mongo::getReplicaSetUrl);
-//    }
+    @Container
+    static MongoDBContainer mongo = new MongoDBContainer("mongo:latest");
+
+    @DynamicPropertySource
+    static void mongoProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", mongo::getReplicaSetUrl);
+    }
 
     @Override
     public ProductRepository repository() {

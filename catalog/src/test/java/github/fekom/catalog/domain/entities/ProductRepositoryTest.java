@@ -22,7 +22,7 @@ public abstract class ProductRepositoryTest {
         Optional<Product> result = repository().findById(domain.id());
 
         assertTrue(result.isPresent());
-
+        assertEquals(domain.id(), result.get().id());
 
     }
 
