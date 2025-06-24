@@ -4,17 +4,13 @@ import github.fekom.catalog.domain.entities.Product;
 import github.fekom.catalog.domain.entities.ProductRepository;
 import org.instancio.Instancio;
 import org.instancio.Select;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +24,7 @@ import static org.mockito.Mockito.*;
 class ProductApiTest {
 
     @InjectMocks
-    ProductApi service;
+    ProductService service;
 
     @Mock
     ProductRepository repository;
