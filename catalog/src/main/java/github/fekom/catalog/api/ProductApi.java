@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -21,11 +22,10 @@ public class ProductApi {
     }
 
     @Transactional
-    public Product createOneProduct(String name, BigDecimal price, int stock, List<String> tags,
-                                    Optional<String> category, Optional<String> description) {
+    public Product createOneProduct(String name, BigDecimal price, int stock, List<String> tags, Optional<String> category, Optional<String> description) {
+        Product newProduct = Product.create(name, price, stock, tags, category, description);
 
-        var newProduct = Product.create(name, price, stock, tags, category,description);
-        productRepository.saveOne(Collections.singletonList(newProduct));
+        productRepository.save(newProduct);
         return newProduct;
     }
 
@@ -55,5 +55,12 @@ public class ProductApi {
         );
         productRepository.update(updatedProduct);
         return updatedProduct;
+    }
+
+    public Optional<Product> findById(String id) {
+        if( id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Product ID cannot be null or empty");
+        }
+        return productRepository.findById(id);
     }
 }

@@ -5,15 +5,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository {
-    void saveList(List<Product> productList);
+    void save(List<Product> product);
 
-    default void saveOne(List<Product> product) {
+    default void save(Product product) {
+        save(List.of(product));
     }
 
      Optional <Product> findById(String id) ;
 
     void deleteById(String id);
 
-     void update(Product product);
+     Product update(Product product);
 
 }
