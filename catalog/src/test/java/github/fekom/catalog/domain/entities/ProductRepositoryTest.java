@@ -1,9 +1,12 @@
 package github.fekom.catalog.domain.entities;
 
 import org.instancio.Instancio;
+import org.instancio.Select;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,7 +19,9 @@ public abstract class ProductRepositoryTest {
 
     @Test
     void save() {
-        var domain = Instancio.create(Product.class);
+        List<String> tags = new ArrayList<>(List.of("tecnologia", "hardware", "gamer", "promoção"));
+        var domain = Instancio.of(Product.class)
+                .set(Select.field(Product::tags), tags).create();
         repository().save(domain);
 
         Optional<Product> result = repository().findById(domain.id());
@@ -28,7 +33,9 @@ public abstract class ProductRepositoryTest {
 
     @Test
     void findById() {
-        var domain = Instancio.create(Product.class);
+        List<String> tags = new ArrayList<>(List.of("tecnologia", "hardware", "gamer", "promoção"));
+        var domain = Instancio.of(Product.class)
+                .set(Select.field(Product::tags), tags).create();
         repository().save(domain);
 
         Optional<Product> result = repository().findById(domain.id());
@@ -39,7 +46,10 @@ public abstract class ProductRepositoryTest {
 
     @Test
     void deleteById() {
-        var domain = Instancio.create(Product.class);
+        List<String> tags = new ArrayList<>(List.of("tecnologia", "hardware", "gamer", "promoção"));
+        var domain = Instancio.of(Product.class)
+                .set(Select.field(Product::tags), tags).create();
+
         repository().save(domain);
 
 
@@ -52,8 +62,13 @@ public abstract class ProductRepositoryTest {
 
     @Test
     void update() {
-        var product1 = Instancio.create(Product.class);
-        var product2 = Instancio.create(Product.class);
+        var tags1 = new ArrayList<>(List.of("tecnologia", "hardware", "gamer", "promoção"));
+        var tags2 = new ArrayList<>(List.of("casa", "conforto", "xablau", "xpto"));
+        var product1 = Instancio.of(Product.class)
+                .set(Select.field(Product::tags), tags1).create();
+
+        var product2 = Instancio.of(Product.class)
+                .set(Select.field(Product::tags), tags2).create();
 
         repository().save(product1);
 

@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-//entidade do sistema, desacoplado de framework
-//record para dados imutaveis
 public record Product(String id,
                       String name,
                       BigDecimal price,
@@ -27,12 +25,26 @@ public record Product(String id,
                                  Optional<String> category,
                                  Optional<String> description) {
 
+        if(name.length() < 2 || name.length() > 100) {
+            throw new IllegalArgumentException("Name must be between 2 and 100 characters");
+        }
+        if(name.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be blank");
+        }
+
+        if(tags.size() > 5) {
+            throw new IllegalArgumentException("Tags cannot be more than 5");
+        }
+        if(tags.isEmpty()) {
+            throw new IllegalArgumentException("Tags cannot be null or empty");
+        }
         if(price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Price must be greater than zero");
         }
         if(stock < 0) {
             throw new IllegalArgumentException("Stock must be greater than zero");
         }
+
         return new Product(UUID.randomUUID().toString(), name, price, stock, LocalDateTime.now(), LocalDateTime.now(), tags, category, description);
     }
 
@@ -43,6 +55,19 @@ public record Product(String id,
                                       List<String> tags,
                                       Optional<String> category,
                                       Optional<String> description) {
+        if(name.length() < 2 || name.length() > 100) {
+            throw new IllegalArgumentException("Name must be between 2 and 100 characters");
+        }
+        if(name.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be blank");
+        }
+
+        if(tags.size() > 5) {
+            throw new IllegalArgumentException("Tags cannot be more than 5");
+        }
+        if(tags.isEmpty()) {
+            throw new IllegalArgumentException("Tags cannot be null or empty");
+        }
         if(price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Price must be greater than zero");
         }
