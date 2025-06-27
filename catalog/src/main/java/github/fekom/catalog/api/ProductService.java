@@ -20,9 +20,8 @@ public class ProductService {
     }
 
     @Transactional
-    public Product createOneProduct(String name, BigDecimal price, int stock, List<String> tags, Optional<String> category, Optional<String> description) {
+    public Product createOneProduct(String name, long price, int stock, List<String> tags, Optional<String> category, Optional<String> description) {
         Product newProduct = Product.create(name, price, stock, tags, category, description);
-
         productRepository.save(newProduct);
         return newProduct;
     }
@@ -33,7 +32,7 @@ public class ProductService {
     }
 
     @Transactional
-    public Product update(String id, String name, BigDecimal price, int stock, List<String> tags,
+    public Product update(String id, String name, long price, int stock, List<String> tags,
                           Optional<String> category, Optional<String> description){
 
         if( id == null || id.isEmpty()) {

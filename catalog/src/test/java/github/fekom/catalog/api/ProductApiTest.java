@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.math.BigDecimal;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ class ProductApiTest {
                 .create();
 
         String name = generatedProduct.name();
-        BigDecimal price = generatedProduct.price();
+        long price = generatedProduct.price();
         int stock = generatedProduct.stock();
         List<String> tags = generatedProduct.tags();
         Optional<String> category = generatedProduct.category();
@@ -105,10 +105,9 @@ class ProductApiTest {
         String nameProduct1 = "xpto";
         String nameProduct2 = "xpto2";
 
-        // product1 simula o produto existente no banco de dados.
         Product product1 = Product.create(
                         nameProduct1,
-                        new BigDecimal("100.00"),
+                        10000L,
                         10,
                         tags,
                         Optional.of("Eletrônicos"),
@@ -121,7 +120,7 @@ class ProductApiTest {
 
         Product product2 = Product.create(
                 nameProduct2,
-                new BigDecimal("129.90"),
+                12990L,
                 5,
                 tags2,
                 Optional.of("Casa"),
@@ -146,15 +145,15 @@ class ProductApiTest {
         verifyNoMoreInteractions(repository);
 
         assertThat(updatedProductResult).isNotNull();
-        assertThat(updatedProductResult.id()).isEqualTo(productId); // O ID deve ser o mesmo
+        assertThat(updatedProductResult.id()).isEqualTo(productId);
         assertThat(updatedProductResult.name()).isEqualTo(product2.name());
         assertThat(updatedProductResult.price()).isEqualTo(product2.price());
         assertThat(updatedProductResult.stock()).isEqualTo(product2.stock());
         assertThat(updatedProductResult.tags()).isEqualTo(product2.tags());
         assertThat(updatedProductResult.category()).isEqualTo(product2.category());
         assertThat(updatedProductResult.description()).isEqualTo(product2.description());
-        assertThat(updatedProductResult.createAt()).isEqualTo(product1.createAt()); // createdAt deve ser o mesmo
-        assertThat(updatedProductResult.updateAt()).isAfterOrEqualTo(product1.updateAt()); // updatedAt deve ter sido atualizado (ou ser igual se for o mesmo instante)
+        assertThat(updatedProductResult.createAt()).isEqualTo(product1.createAt());
+        assertThat(updatedProductResult.updateAt()).isAfterOrEqualTo(product1.updateAt());
 
     }
 }
