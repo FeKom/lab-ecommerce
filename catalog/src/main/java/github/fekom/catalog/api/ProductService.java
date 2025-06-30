@@ -7,24 +7,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductApi {
+public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public ProductApi(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
     @Transactional
-    public Product createOneProduct(String name, BigDecimal price, int stock, List<String> tags, Optional<String> category, Optional<String> description) {
+    public Product createOneProduct(String name, long price, int stock, List<String> tags, Optional<String> category, Optional<String> description) {
         Product newProduct = Product.create(name, price, stock, tags, category, description);
-
         productRepository.save(newProduct);
         return newProduct;
     }
@@ -35,7 +32,7 @@ public class ProductApi {
     }
 
     @Transactional
-    public Product update(String id, String name, BigDecimal price, int stock, List<String> tags,
+    public Product update(String id, String name, long price, int stock, List<String> tags,
                           Optional<String> category, Optional<String> description){
 
         if( id == null || id.isEmpty()) {

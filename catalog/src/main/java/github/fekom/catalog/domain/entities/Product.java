@@ -1,7 +1,6 @@
 package github.fekom.catalog.domain.entities;
 
 
-import java.math.BigDecimal;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.UUID;
 
 public record Product(String id,
                       String name,
-                      BigDecimal price,
+                      long price,
                       int stock,
                       LocalDateTime createAt,
                       LocalDateTime updateAt,
@@ -19,7 +18,7 @@ public record Product(String id,
                       Optional<String> description) {
 
     public static Product create(String name,
-                                 BigDecimal price,
+                                 long price,
                                  int stock,
                                  List<String> tags,
                                  Optional<String> category,
@@ -38,10 +37,10 @@ public record Product(String id,
         if(tags.isEmpty()) {
             throw new IllegalArgumentException("Tags cannot be null or empty");
         }
-        if(price.compareTo(BigDecimal.ZERO) < 0) {
+        if(price <= 0) {
             throw new IllegalArgumentException("Price must be greater than zero");
         }
-        if(stock < 0) {
+        if(stock <= 0) {
             throw new IllegalArgumentException("Stock must be greater than zero");
         }
 
@@ -50,7 +49,7 @@ public record Product(String id,
 
     //pega novos valores para os atributos e cria um novo product record mantendo o ID e o CREATEAT
     public Product withUpdatedDetails(String name,
-                                      BigDecimal price,
+                                      long price,
                                       int stock,
                                       List<String> tags,
                                       Optional<String> category,
@@ -68,11 +67,11 @@ public record Product(String id,
         if(tags.isEmpty()) {
             throw new IllegalArgumentException("Tags cannot be null or empty");
         }
-        if(price.compareTo(BigDecimal.ZERO) < 0) {
+        if(price <= 0) {
             throw new IllegalArgumentException("Price must be greater than zero");
         }
 
-        if(stock < 0) {
+        if(stock <= 0) {
             throw new IllegalArgumentException("Stock must be greater than zero");
         }
 
