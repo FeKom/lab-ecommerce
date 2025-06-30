@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public record Product(String id,
                       String name,
-                      long price,
+                      BigDecimal price,
                       int stock,
                       LocalDateTime createAt,
                       LocalDateTime updateAt,
@@ -19,7 +19,7 @@ public record Product(String id,
                       Optional<String> description) {
 
     public static Product create(String name,
-                                 long price,
+                                 BigDecimal price,
                                  int stock,
                                  List<String> tags,
                                  Optional<String> category,
@@ -38,7 +38,7 @@ public record Product(String id,
         if(tags.isEmpty()) {
             throw new IllegalArgumentException("Tags cannot be null or empty");
         }
-        if(price <= 0 ) {
+        if(price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Price must be greater than zero");
         }
         if(stock < 0) {
@@ -48,8 +48,9 @@ public record Product(String id,
         return new Product(UUID.randomUUID().toString(), name, price, stock, LocalDateTime.now(), LocalDateTime.now(), tags, category, description);
     }
 
+    //pega novos valores para os atributos e cria um novo product record mantendo o ID e o CREATEAT
     public Product withUpdatedDetails(String name,
-                                      long price,
+                                      BigDecimal price,
                                       int stock,
                                       List<String> tags,
                                       Optional<String> category,
@@ -67,7 +68,7 @@ public record Product(String id,
         if(tags.isEmpty()) {
             throw new IllegalArgumentException("Tags cannot be null or empty");
         }
-        if(price <= 0) {
+        if(price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Price must be greater than zero");
         }
 
