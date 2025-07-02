@@ -20,10 +20,8 @@ public class ProductService {
     }
 
     @Transactional
-    public Product createOneProduct(String name, long price, int stock, List<String> tags, Optional<String> category, Optional<String> description) {
-        Product newProduct = Product.create(name, price, stock, tags, category, description);
-        productRepository.save(newProduct);
-        return newProduct;
+    public void createOneProduct(Product product) {
+        productRepository.save(product);
     }
 
     @Transactional
@@ -32,7 +30,7 @@ public class ProductService {
     }
 
     @Transactional
-    public Product update(String id, String name, long price, int stock, List<String> tags,
+    public void update(String id, String name, long price, int stock, List<String> tags,
                           Optional<String> category, Optional<String> description){
 
         if( id == null || id.isEmpty()) {
@@ -51,7 +49,6 @@ public class ProductService {
 
         );
         productRepository.update(updatedProduct);
-        return updatedProduct;
     }
 
     public Optional<Product> findById(String id) {
