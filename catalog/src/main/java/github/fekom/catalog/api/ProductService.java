@@ -6,7 +6,6 @@ import github.fekom.catalog.domain.entities.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,9 +32,6 @@ public class ProductService {
     public void update(String id, String name, long price, int stock, List<String> tags,
                           Optional<String> category, Optional<String> description){
 
-        if( id == null || id.isEmpty()) {
-            throw new IllegalArgumentException("Product ID cannot be null or empty");
-        }
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product with ID " + id + " not found for update"  ));
 
@@ -51,10 +47,10 @@ public class ProductService {
         productRepository.update(updatedProduct);
     }
 
-    public Optional<Product> findById(String id) {
+    public Product findById(String id) {
         if( id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Product ID cannot be null or empty");
         }
-        return productRepository.findById(id);
+        return productRepository.findById(id).orElseThrow();
     }
 }
