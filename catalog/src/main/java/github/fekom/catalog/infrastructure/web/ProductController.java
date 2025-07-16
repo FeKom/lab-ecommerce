@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/products")
@@ -40,8 +39,8 @@ public class ProductController {
                 requestDTO.parsePriceInCents(),
                 requestDTO.stock(),
                 requestDTO.tags(),
-                Optional.ofNullable(requestDTO.category()),
-                Optional.ofNullable(requestDTO.description())
+                requestDTO.category(),
+                requestDTO.description()
         );
         return ResponseEntity.ok(ProductResponse.fromDomainEntity(service.findById(id)));
     }

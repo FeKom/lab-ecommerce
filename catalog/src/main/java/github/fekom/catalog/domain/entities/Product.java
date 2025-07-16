@@ -3,26 +3,28 @@ package github.fekom.catalog.domain.entities;
 
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public record Product(String id,
                       String name,
                       long price,
                       int stock,
-                      LocalDateTime createAt,
-                      LocalDateTime updateAt,
+                      String createAt,
+                      String updateAt,
                       List<String> tags,
-                      Optional<String> category,
-                      Optional<String> description) {
+                      String category,
+                      String description) {
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     public static Product create(String name,
                                  long price,
                                  int stock,
                                  List<String> tags,
-                                 Optional<String> category,
-                                 Optional<String> description) {
+                                 String category,
+                                 String description) {
 
         if(name.length() < 2 || name.length() > 100) {
             throw new IllegalArgumentException("Name must be between 2 and 100 characters");
@@ -44,7 +46,9 @@ public record Product(String id,
             throw new IllegalArgumentException("Stock must be greater than zero");
         }
 
-        return new Product(UUID.randomUUID().toString(), name, price, stock, LocalDateTime.now(), LocalDateTime.now(), tags, category, description);
+
+        String now = LocalDateTime.now().format(formatter);
+        return new Product(UUID.randomUUID().toString(), name, price, stock, now, now, tags, category, description);
     }
 
     //pega novos valores para os atributos e cria um novo product record mantendo o ID e o CREATEAT
@@ -52,8 +56,8 @@ public record Product(String id,
                                       long price,
                                       int stock,
                                       List<String> tags,
-                                      Optional<String> category,
-                                      Optional<String> description) {
+                                      String category,
+                                      String description) {
         if(name.length() < 2 || name.length() > 100) {
             throw new IllegalArgumentException("Name must be between 2 and 100 characters");
         }
@@ -74,14 +78,14 @@ public record Product(String id,
         if(stock <= 0) {
             throw new IllegalArgumentException("Stock must be greater than zero");
         }
-
+        String updateAt = LocalDateTime.now().format(formatter);
         return new Product(
                 this.id,
                 name,
                 price,
                 stock,
                 this.createAt,
-                LocalDateTime.now(),
+                updateAt,
                 tags,
                 category,
                 description);
@@ -99,7 +103,9 @@ public record Product(String id,
                 this.category,
                 this.description);
     }
-    public Product withTimestamps(LocalDateTime createdAt, LocalDateTime updatedAt) {
-        return new Product(this.id, this.name, this.price, this.stock, createdAt, updatedAt, this.tags, this.category, this.description);
+    public Product withTimestamps(LocalDateTime createAt, LocalDateTime updateAt) {
+        String createdAtStr = createAt != null ? createAt.format(formatter) : this.createAt;
+        String updatedAtStr = updateAt != null ? updateAt.format(formatter) : this.updateAt;
+        return new Product(this.id, this.name, this.price, this.stock, createdAtStr, updatedAtStr, this.tags, this.category, this.description);
     }
 }

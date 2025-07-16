@@ -8,8 +8,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 public record UpdateProductRequest(
         @NotBlank(message = "Product name cannot be blank")
@@ -25,23 +25,24 @@ public record UpdateProductRequest(
         String description
 ) {
     //parsePriceInCents delega para o utilitário
+        private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     public long parsePriceInCents() {
         return MoneyConverter.toCents(this.price);
     }
 
     public Product toDomainEntity(Product existingDomainProduct) {
         long parsedPrice = this.parsePriceInCents();
-
+        String now = LocalDateTime.now().format(formatter);
         return new Product(
                 existingDomainProduct.id(),
                 this.name,
                 parsedPrice,
                 this.stock,
                 existingDomainProduct.createAt(),
-                LocalDateTime.now(),
+                now,
                 this.tags,
-                Optional.ofNullable(this.category),
-                Optional.ofNullable(this.description)
+                this.category,
+                this.description
         );
     }
 }

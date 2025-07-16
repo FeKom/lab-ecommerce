@@ -36,8 +36,8 @@ public record CreateProductRequest (
                     this.parsePriceInCents(),
                     this.stock,
                     this.tags,
-                    Optional.ofNullable(this.category),
-                    Optional.ofNullable(this.description)
+                    this.category,
+                    this.description
             );
         }
     }

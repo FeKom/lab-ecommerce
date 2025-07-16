@@ -63,8 +63,8 @@ public class NoSQLProductRepository implements ProductRepository {
         update.set("stock", product.stock());
         update.set("updatedAt", LocalDateTime.now());
         update.set("tags", product.tags());
-        product.category().ifPresent(category -> update.set("category", category));
-        product.description().ifPresent(description -> update.set("description", description));
+        update.set("category", product.category());
+        update.set("description", product.description());
 
         var persistence = github.fekom.catalog.infrastructure.persistence.Product.class;
 
