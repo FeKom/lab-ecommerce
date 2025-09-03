@@ -108,8 +108,8 @@ class ProductServiceTest {
                         10000L,
                         10,
                         tags,
-                        Optional.of("Eletrônicos"),
-                        Optional.of("Produto original de fábrica")
+                        "Eletrônicos",
+                        "Produto original de fábrica"
                 ).withId(productId)
                 .withTimestamps(
                         LocalDateTime.of(2023, 1, 1, 0, 0, 0),
@@ -121,8 +121,8 @@ class ProductServiceTest {
                 12990L,
                 5,
                 tags2,
-                Optional.of("Casa"),
-                Optional.of("Nova versão do produto")
+                "Casa",
+                "Nova versão do produto"
         );
 
         when(repository.findById(product1.id())).thenReturn(Optional.of(product1));
@@ -135,8 +135,8 @@ class ProductServiceTest {
                 12990L,
                 5,
                 tags2,
-                Optional.of("Casa"),
-                Optional.of("Nova versão do produto")
+                "Casa",
+                "Nova versão do produto"
         );
 
         verify(repository).findById(productId);
@@ -153,7 +153,7 @@ class ProductServiceTest {
         assertThat(updatedProduct.category()).isEqualTo(Optional.of("Casa"));
         assertThat(updatedProduct.description()).isEqualTo(Optional.of("Nova versão do produto"));
         assertThat(updatedProduct.createAt()).isEqualTo(product1.createAt());
-        assertThat(updatedProduct.updateAt()).isAfterOrEqualTo(product1.updateAt());
+        assertThat(updatedProduct.updateAt()).isEqualTo(product1.updateAt());
     }
 
 //     @Test

@@ -3,24 +3,33 @@ package github.fekom.catalog.api;
 
 import github.fekom.catalog.domain.entities.Product;
 import github.fekom.catalog.domain.entities.ProductRepository;
+
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService {
 
+    private final KafkaTemplate<String, Product> kafkaTemplate;
     private final ProductRepository productRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, KafkaTemplate<String, Product> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
         this.productRepository = productRepository;
     }
 
-    @Transactional
     public void createOneProduct(Product product) {
-        productRepository.save(product);
+        try {
+            productRepository.save(product);
+            kafkaTemplate.send("topic-1", "Product: ", product);
+        } catch (Exception e) {
+            System.err.println("Erro ao passar para o kafka: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Falha ao passar o produto para o kafka", e);
+        }
     }
 
     @Transactional
@@ -29,8 +38,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void update(String id, String name, long price, int stock, List<String> tags,
-                          Optional<String> category, Optional<String> description){
+    public void update(String id, String name, long price, int stock, List<String> tags, String category, String description){
 
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product with ID " + id + " not found for update"  ));
@@ -51,6 +59,10 @@ public class ProductService {
         if( id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Product ID cannot be null or empty");
         }
-        return productRepository.findById(id).orElseThrow();
+        System.out.println("Buscando produto com id " + id + " no MongoDB");
+        Product product = productRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Product with ID " + id + " not found"));
+        System.out.println("Produto encontrado: " + product.id());
+        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product with ID " + id + " not found"));
     }
 }

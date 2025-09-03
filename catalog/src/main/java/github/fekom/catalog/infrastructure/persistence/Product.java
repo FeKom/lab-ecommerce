@@ -5,10 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Document(collection = "product")
 @TypeAlias("Product")
@@ -18,8 +16,8 @@ public class Product {
     private String name;
     private long price;
     private int stock;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String createdAt;
+    private String updatedAt;
     private List<String> tags;
     private String category;
     private String description;
@@ -56,19 +54,19 @@ public class Product {
         this.stock = stock;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -107,8 +105,8 @@ public class Product {
         entity.setCreatedAt(domain.createAt());
         entity.setUpdatedAt(domain.updateAt());
         entity.setTags(domain.tags());
-        entity.setCategory(domain.category().orElse(null));
-        entity.setDescription(domain.description().orElse(null));
+        entity.setCategory(domain.category());
+        entity.setDescription(domain.description());
 
         return entity;
     }
@@ -122,8 +120,8 @@ public class Product {
                 getCreatedAt(),
                 getUpdatedAt(),
                 getTags(),
-                Optional.ofNullable(getCategory()),
-                Optional.ofNullable(getDescription()));
+                getCategory(),
+                getDescription());
     }
 
 

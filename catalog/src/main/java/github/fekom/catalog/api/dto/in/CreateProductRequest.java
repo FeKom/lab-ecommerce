@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Pattern;
 
 
 import java.util.List;
-import java.util.Optional;
 
 public record CreateProductRequest (
     @NotBlank(message = "Product name cannot be blank")
@@ -36,8 +35,8 @@ public record CreateProductRequest (
                     this.parsePriceInCents(),
                     this.stock,
                     this.tags,
-                    Optional.ofNullable(this.category),
-                    Optional.ofNullable(this.description)
+                    this.category,
+                    this.description
             );
         }
     }
