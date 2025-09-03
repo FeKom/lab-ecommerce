@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Pattern;
 
 
 import java.util.List;
-import java.util.Optional;
 
 public record CreateProductRequest (
     @NotBlank(message = "Product name cannot be blank")

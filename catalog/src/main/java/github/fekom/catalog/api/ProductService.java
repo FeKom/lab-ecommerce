@@ -4,48 +4,37 @@ package github.fekom.catalog.api;
 import github.fekom.catalog.domain.entities.Product;
 import github.fekom.catalog.domain.entities.ProductRepository;
 
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class ProductService {
 
+    private final KafkaTemplate<String, Product> kafkaTemplate;
     private final ProductRepository productRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
-    // private final RedisCacheConfiguration cacheConfiguration;
 
-    public ProductService(ProductRepository productRepository, RedisTemplate<String, Object> redisTemplate /*RedisCacheConfiguration cacheConfiguration*/) {
+    public ProductService(ProductRepository productRepository, KafkaTemplate<String, Product> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
         this.productRepository = productRepository;
-        this.redisTemplate = redisTemplate;
-        // this.cacheConfiguration = cacheConfiguration;
     }
 
     public void createOneProduct(Product product) {
         try {
             productRepository.save(product);
-            redisTemplate.opsForValue().set("product:" + product.id(), product);
+            kafkaTemplate.send("topic-1", "Product: ", product);
         } catch (Exception e) {
-            System.err.println("Erro ao salvar no Redis: " + e.getMessage());
+            System.err.println("Erro ao passar para o kafka: " + e.getMessage());
             e.printStackTrace();
-            throw new RuntimeException("Falha ao salvar produto no Redis", e);
+            throw new RuntimeException("Falha ao passar o produto para o kafka", e);
         }
     }
 
     @Transactional
-    @CacheEvict(value = "products", key = "#id")
     public void delete(String id) {
         productRepository.deleteById(id);
-        redisTemplate.delete("product: " + id);
     }
 
     @Transactional
@@ -66,7 +55,6 @@ public class ProductService {
         productRepository.update(updatedProduct);
     }
 
-    @Cacheable(value = "products", key = "#id", unless = "#result == null")
     public Product findById(String id) {
         if( id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Product ID cannot be null or empty");
@@ -75,7 +63,6 @@ public class ProductService {
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Product with ID " + id + " not found"));
         System.out.println("Produto encontrado: " + product.id());
-        redisTemplate.opsForValue().set("product:" + id, product,10, TimeUnit.MINUTES);
         return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product with ID " + id + " not found"));
     }
 }
