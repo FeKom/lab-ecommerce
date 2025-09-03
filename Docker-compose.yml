@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   catalog:
     build:
@@ -13,65 +11,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      MONGO_URL: mongodb://mongo:27017/catalog
-      SPRING_DATA_REDIS_HOST: redis 
-      SPRING_DATA_REDIS_PORT: 6379
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    networks:
-      - ecommerce-network
-    
 
 
-  postgres:
-    image: postgres:15.5
-    container_name: postgres
-    environment:
-      POSTGRES_DB:
-      POSTGRES_USER:
-      POSTGRES_PASSWORD:
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - ecommerce-network
-
-  mongo:
-    image: mongo:6.0
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-    networks:
-      - ecommerce-network
-  redis:
-    image: redis:6.2
-    container_name: redis
-    ports:
-      - "6379:6379"
-    networks:
-      - ecommerce-network
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
-    container_name: zookeeper
-    restart: unless-stopped 
-    environment:
-     ZOOKEEPER_CLIENT_PORT: 2181
-     ZOOKEEPER_TICK_TIME: 2000
-    ports:
-     - "2181:2181"
-    networks:
-     - ecommerce-network 
-    volumes: 
-     - zookeeper-data:/var/lib/zookeeper/data
-     - zookeeper-logs:/var/lib/zookeeper/log 
-      
-  kafka:
-    image: confluentinc/cp-kafka:7.3.0
-    container_name: kafka 
-    restart: unless-stopped
     depends_on:
       - zookeeper
     ports:
@@ -79,19 +20,6 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT 
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092 
-      KAFKA_INTER_BROKER_LISTENER_NAME: 
-      PLAINTEXT KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true" 
-      KAFKA_DELETE_TOPIC_ENABLE: "true" 
-      KAFKA_LOG_RETENTION_HOURS: 168 
-    networks:
-     - ecommerce-network 
-    volumes: 
-     - kafka-data:/var/lib/kafka/data
-
       
 networks:
   ecommerce-network:
