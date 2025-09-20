@@ -24,15 +24,21 @@ public class KafkaProducerConfig {
         @Bean
         public ProducerFactory<String, Product> productProducerFactory() {
                 Map<String, Object> props = new HashMap<>();
-                props.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
                 props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
                 props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
                 props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+                props.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
+                props.put(ProducerConfig.ACKS_CONFIG, "1");
+                props.put(ProducerConfig.RETRIES_CONFIG, 3);
+                props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+                props.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
+                props.put(ProducerConfig.LINGER_MS_CONFIG, 5);
+
                 return new DefaultKafkaProducerFactory<>(props);
         }
 
         @Bean
-        public KafkaTemplate<String, Product> orderKafkaTemplate() {
+        public KafkaTemplate<String, Product> productKafkaTemplate() {
                 return new KafkaTemplate<>(productProducerFactory());
         }
 }
