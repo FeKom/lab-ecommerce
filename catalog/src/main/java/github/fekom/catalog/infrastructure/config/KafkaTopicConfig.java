@@ -12,7 +12,7 @@ import org.springframework.kafka.core.KafkaAdmin;
 
 @Configuration
 public class KafkaTopicConfig {
-        
+
     @Value(value = "${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
 
@@ -22,9 +22,19 @@ public class KafkaTopicConfig {
         configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         return new KafkaAdmin(configs);
     }
-    
+
     @Bean
-    public NewTopic topicOrderProcessed() {
-         return new NewTopic("product-search-processed", 2, (short) 1);
+    public NewTopic productSearchProcessedTopic() {
+        return new NewTopic("product-search-processed", 2, (short) 1);
+    }
+
+    @Bean
+    public NewTopic productCreatedTopic() {
+        return new NewTopic("product-created", 2, (short) 1);
+    }
+
+    @Bean
+    public NewTopic productUpdatedTopic() {
+        return new NewTopic("product-updated", 2, (short) 1);
     }
 }
