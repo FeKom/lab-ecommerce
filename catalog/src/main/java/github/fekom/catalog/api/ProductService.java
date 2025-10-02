@@ -4,27 +4,32 @@ package github.fekom.catalog.api;
 import github.fekom.catalog.domain.entities.Product;
 import github.fekom.catalog.domain.entities.ProductRepository;
 
-import org.springframework.kafka.core.KafkaTemplate;
+import github.fekom.catalog.infrastructure.cache.RedisProductCache;
+import github.fekom.catalog.infrastructure.event.ProductEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
 
-    private final KafkaTemplate<String, Product> kafkaTemplate;
     private final ProductRepository productRepository;
+    private final ProductEventPublisher eventPublisher;
+    private final RedisProductCache redisProductCache;
 
-    public ProductService(ProductRepository productRepository, KafkaTemplate<String, Product> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
+    public ProductService(ProductRepository productRepository, ProductEventPublisher eventPublisher, RedisProductCache redisProductCache) {
         this.productRepository = productRepository;
+        this.eventPublisher = eventPublisher;
+        this.redisProductCache = redisProductCache;
     }
 
     public void createOneProduct(Product product) {
         try {
             productRepository.save(product);
-            kafkaTemplate.send("topic-1", "Product: ", product);
+            eventPublisher.publishProductCreatedEvent(product);
+            redisProductCache.cacheProduct(product);
         } catch (Exception e) {
             System.err.println("Erro ao passar para o kafka: " + e.getMessage());
             e.printStackTrace();
@@ -34,16 +39,25 @@ public class ProductService {
 
     @Transactional
     public void delete(String id) {
+        var existingProduct = findProductById(id);
+        if(existingProduct.isEmpty()) {
+            throw new IllegalArgumentException("Product not Found to delete with id:" + id);
+        }
         productRepository.deleteById(id);
+        redisProductCache.deleteCachedProduct(id);
+        eventPublisher.publishProductDeletedEvent(id);
     }
 
     @Transactional
     public void update(String id, String name, long price, int stock, List<String> tags, String category, String description){
 
-        Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product with ID " + id + " not found for update"  ));
+        Optional<Product> existingProduct = productRepository.findById(id);
+        if(existingProduct.isEmpty()) {
+            throw new IllegalArgumentException("Product not Found with ID:" + id);
+        }
 
-        Product updatedProduct = existingProduct.withUpdatedDetails(
+
+        Product updatedProduct = existingProduct.get().withUpdatedDetails(
                 name,
                 price,
                 stock,
@@ -53,16 +67,18 @@ public class ProductService {
 
         );
         productRepository.update(updatedProduct);
+        redisProductCache.cacheProduct(updatedProduct); // Atualiza o cache
+        eventPublisher.publishProductUpdatedEvent(updatedProduct); // Publica evento no Kafka
+
     }
 
-    public Product findById(String id) {
-        if( id == null || id.isEmpty()) {
-            throw new IllegalArgumentException("Product ID cannot be null or empty");
+    public Optional<Product> findProductById(String id) {
+        Optional<Product> cachedProduct = redisProductCache.getCachedProduct(id);
+        if (cachedProduct.isPresent()) {
+            return cachedProduct;
         }
-        System.out.println("Buscando produto com id " + id + " no MongoDB");
-        Product product = productRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Product with ID " + id + " not found"));
-        System.out.println("Produto encontrado: " + product.id());
-        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product with ID " + id + " not found"));
+        Optional<Product> product = productRepository.findById(id);
+        product.ifPresent(redisProductCache::cacheProduct);
+        return product;
     }
 }

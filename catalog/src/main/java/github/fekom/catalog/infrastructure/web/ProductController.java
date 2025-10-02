@@ -28,7 +28,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable String id) {
-        return ResponseEntity.ok(ProductResponse.fromDomainEntity(service.findById(id)));
+        return ResponseEntity.ok(ProductResponse.fromDomainEntity(service.findProductById(id).orElseThrow()));
     }
 
     @PutMapping("/{id}")
@@ -42,7 +42,7 @@ public class ProductController {
                 requestDTO.category(),
                 requestDTO.description()
         );
-        return ResponseEntity.ok(ProductResponse.fromDomainEntity(service.findById(id)));
+        return ResponseEntity.ok(ProductResponse.fromDomainEntity(service.findProductById(id).orElseThrow()));
     }
 
     @DeleteMapping("/{id}")

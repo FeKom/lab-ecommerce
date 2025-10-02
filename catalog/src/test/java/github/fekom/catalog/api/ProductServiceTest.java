@@ -84,7 +84,7 @@ class ProductServiceTest {
 
         when(repository.findById(productId)).thenReturn(Optional.of(product));
 
-        Product result = service.findById(productId);
+        Product result = service.findProductById(productId).orElseThrow();
 
         assertNotNull(result);
         assertThat(result).isEqualTo(product);
