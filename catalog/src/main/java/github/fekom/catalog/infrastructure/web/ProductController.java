@@ -4,6 +4,7 @@ import github.fekom.catalog.api.ProductService;
 import github.fekom.catalog.api.dto.in.CreateProductRequest;
 import github.fekom.catalog.api.dto.in.UpdateProductRequest;
 import github.fekom.catalog.api.dto.out.ProductResponse;
+import github.fekom.catalog.domain.entities.Product;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,15 +34,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProductById(@PathVariable String id, @Valid @RequestBody UpdateProductRequest requestDTO) {
-        service.update(
-                id,
-                requestDTO.name(),
-                requestDTO.parsePriceInCents(),
-                requestDTO.stock(),
-                requestDTO.tags(),
-                requestDTO.category(),
-                requestDTO.description()
-        );
+        service.update(id, requestDTO);
         return ResponseEntity.ok(ProductResponse.fromDomainEntity(service.findProductById(id).orElseThrow()));
     }
 

@@ -2,6 +2,8 @@ package github.fekom.catalog.domain.entities;
 
 
 
+import github.fekom.catalog.api.dto.in.UpdateProductData;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -52,30 +54,25 @@ public record Product(String id,
     }
 
     //pega novos valores para os atributos e cria um novo product record mantendo o ID e o CREATEAT
-    public Product withUpdatedDetails(String name,
-                                      long price,
-                                      int stock,
-                                      List<String> tags,
-                                      String category,
-                                      String description) {
-        if(name.length() < 2 || name.length() > 100) {
+    public Product withUpdatedDetails(UpdateProductData data) {
+        if(data.name().length() < 2 || data.name().length() > 100) {
             throw new IllegalArgumentException("Name must be between 2 and 100 characters");
         }
-        if(name.isBlank()) {
+        if(data.name().isBlank()) {
             throw new IllegalArgumentException("Name cannot be blank");
         }
 
-        if(tags.size() > 5) {
+        if(data.tags().size() > 5) {
             throw new IllegalArgumentException("Tags cannot be more than 5");
         }
-        if(tags.isEmpty()) {
+        if(data.tags().isEmpty()) {
             throw new IllegalArgumentException("Tags cannot be null or empty");
         }
-        if(price <= 0) {
+        if(data.priceInCents() <= 0) {
             throw new IllegalArgumentException("Price must be greater than zero");
         }
 
-        if(stock <= 0) {
+        if(data.stock() <= 0) {
             throw new IllegalArgumentException("Stock must be greater than zero");
         }
         String updateAt = LocalDateTime.now().format(formatter);

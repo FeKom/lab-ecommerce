@@ -129,15 +129,7 @@ class ProductServiceTest {
 
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
 
-        service.update(
-                productId,
-                nameProduct2,
-                12990L,
-                5,
-                tags2,
-                "Casa",
-                "Nova versão do produto"
-        );
+        //service.update(product1.id(), );
 
         verify(repository).findById(productId);
         verify(repository).update(productCaptor.capture());
