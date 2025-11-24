@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: catalog
+  
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/catalog}
+  
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    github.fekom: ${LOGGING_LEVEL_APP:DEBUG}
+    org.springframework.data.mongodb: ${LOGGING_LEVEL_MONGODB:DEBUG}
+    org.mongodb.driver: ${LOGGING_LEVEL_MONGODB_DRIVER:INFO}

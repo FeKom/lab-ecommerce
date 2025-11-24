@@ -1,6 +1,6 @@
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -11,22 +11,25 @@ services:
       - ecommerce-network
     volumes:
       - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_logs:/var/lib/zookeeper/log
 
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
     depends_on:
-     - zookeeper
+      - zookeeper
     ports:
-     - "9092:9092"
+      - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 168
     networks:
       - ecommerce-network
     volumes:
@@ -38,9 +41,9 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INIT-DB_ROOT_USERNAME: admin
-      MONGO_INIT-DB_ROOT_PASSWORD: password
-      MONGO_INIT-DB_DATABASE: catalog
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: catalog
     volumes:
       - mongo_data:/data/db
     networks:
@@ -58,9 +61,9 @@ services:
 
   catalog:
     build:
-      context: ./catalog
-      dockerfile: Dockerfile
-    container_name: catalog
+      context: .
+      dockerfile: catalog/Dockerfile
+    container_name: catalog-service
     depends_on:
       - kafka
       - redis
@@ -68,13 +71,14 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongo:27017/catalog?authSource=admin
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
+      MONGODB_URI: mongodb://admin:password@mongo:27017/catalog?authSource=admin
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_LEVEL_APP: DEBUG
+      LOGGING_LEVEL_MONGODB_DRIVER: WARN
     networks:
       - ecommerce-network
+    restart: unless-stopped
 
 networks:
   ecommerce-network:
@@ -83,7 +87,6 @@ networks:
 volumes:
   mongo_data:
   redis_data:
-  zookeeper-data:
-  zookeeper-logs:
-  kafka-data:
-  
+  zookeeper_data:
+  zookeeper_logs:
+  kafka_data:
