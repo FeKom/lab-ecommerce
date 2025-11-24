@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,8 +15,8 @@ public class Product {
     @Id
     private String id;
     private String name;
-    private long price;
-    private int stock;
+    private BigDecimal price;
+    private Integer stock;
     private String createdAt;
     private String updatedAt;
     private List<String> tags;

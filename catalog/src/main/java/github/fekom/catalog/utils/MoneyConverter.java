@@ -16,7 +16,7 @@ public final class MoneyConverter {
             throw new IllegalArgumentException("Price cannot be null or empty");
         }
 
-        if (!price.matches("^[0-9]{1,3}(?:\\.[0-9]{3})*\\,[0-9]{1,2}$|^[0-9]+$")) {
+        if (!price.matches("^[0-9]{1,3}(?:\\.[0-9]{3})*,[0-9]{1,2}$|^[0-9]+$")) {
             throw new IllegalArgumentException("Invalid price format. Use format like 1.234,56 or 1234,56 or 5");
         }
         NumberFormat format = NumberFormat.getInstance(Locale.GERMANY);

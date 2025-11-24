@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +106,7 @@ class ProductServiceTest {
 
         Product product1 = Product.create(
                         nameProduct1,
-                        10000L,
+                        BigDecimal.valueOf(10000),
                         10,
                         tags,
                         "Eletrônicos",
@@ -118,7 +119,7 @@ class ProductServiceTest {
 
                  Product.create(
                 nameProduct2,
-                12990L,
+                         BigDecimal.valueOf(12990),
                 5,
                 tags2,
                 "Casa",
@@ -139,7 +140,7 @@ class ProductServiceTest {
         assertThat(updatedProduct).isNotNull();
         assertThat(updatedProduct.id()).isEqualTo(productId);
         assertThat(updatedProduct.name()).isEqualTo(nameProduct2);
-        assertThat(updatedProduct.price()).isEqualTo(12990L);
+        assertThat(updatedProduct.price()).isEqualTo(BigDecimal.valueOf(12990));
         assertThat(updatedProduct.stock()).isEqualTo(5);
         assertThat(updatedProduct.tags()).isEqualTo(tags2);
         assertThat(updatedProduct.category()).isEqualTo(Optional.of("Casa"));

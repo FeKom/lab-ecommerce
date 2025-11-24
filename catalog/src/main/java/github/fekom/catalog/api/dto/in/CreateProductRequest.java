@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record CreateProductRequest (
@@ -23,7 +24,7 @@ public record CreateProductRequest (
     String category,
     String description
 ) {
-        public long parsePriceInCents() {
+        public BigDecimal parsePriceInCents() {
             return MoneyConverter.toCents(this.price);
         }
 
