@@ -4,6 +4,7 @@ package github.fekom.catalog.domain.entities;
 
 import github.fekom.catalog.api.dto.in.UpdateProductData;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -11,8 +12,8 @@ import java.util.UUID;
 
 public record Product(String id,
                       String name,
-                      long price,
-                      int stock,
+                      BigDecimal price,
+                      Integer stock,
                       String createAt,
                       String updateAt,
                       List<String> tags,
@@ -22,7 +23,7 @@ public record Product(String id,
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     public static Product create(String name,
-                                 long price,
+                                 BigDecimal price,
                                  int stock,
                                  List<String> tags,
                                  String category,
@@ -41,7 +42,7 @@ public record Product(String id,
         if(tags.isEmpty()) {
             throw new IllegalArgumentException("Tags cannot be null or empty");
         }
-        if(price <= 0) {
+        if(price.signum() <= 0) {
             throw new IllegalArgumentException("Price must be greater than zero");
         }
         if(stock <= 0) {

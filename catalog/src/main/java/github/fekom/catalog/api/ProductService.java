@@ -30,7 +30,6 @@ public class ProductService {
             eventPublisher.publishProductCreatedEvent(product);
         } catch (Exception e) {
             System.err.println("Erro ao passar para o kafka: " + e.getMessage());
-            e.printStackTrace();
             throw new RuntimeException("Falha ao passar o produto para o kafka", e);
         }
     }

@@ -59,6 +59,19 @@ services:
     networks:
       - ecommerce-network
 
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb-search
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: searchdb
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - ecommerce-network
+
   catalog:
     build:
       context: .
@@ -85,6 +98,7 @@ networks:
     driver: bridge
 
 volumes:
+  mariadb_data:
   mongo_data:
   redis_data:
   zookeeper_data:

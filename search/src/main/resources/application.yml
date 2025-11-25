@@ -1,0 +1,39 @@
+kafka:
+  bootstrap:
+    servers: localhost:9092
+
+mp:
+  messaging:
+    incoming:
+      products:
+        connector: smallrye-kafka
+        topic: catalog-products
+        group:
+          id: search-service
+          auto:
+            offset:
+              reset: earliest
+          value:
+            deserializer: io.quarkus.kafka.client.serialization.ObjectMapperDeserializer
+
+quarkus:
+  datasource:
+    db-kind: mariadb
+    username: root
+    password: root
+    jdbc:
+      url: jdbc:mariadb://localhost:3307/searchdb
+      min-size: 5
+      max-size: 20
+      initial-size: 5       # Conexões iniciais
+      acquisition-timeout: 5s  # Timeout para obter conexão
+      background-validation-interval: 2m  # Validação de conexões
+      idle-removal-interval: 5m  # Remove conexões idle
+      leak-detection-interval: 0  # Detecta connection leaks (0 = desabilitado)
+  hibernate-orm:
+    database:
+      generation: update
+
+  http:
+    port: 8081
+
