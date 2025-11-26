@@ -22,6 +22,8 @@ public class Product {
     private String category;
     private String description;
 
+    public Product(){}
+
     @Override
     public String toString() {
         return "Product{" +

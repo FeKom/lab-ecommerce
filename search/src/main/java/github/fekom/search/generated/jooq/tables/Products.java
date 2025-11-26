@@ -4,8 +4,8 @@
 package github.fekom.search.generated.jooq.tables;
 
 
-import github.fekom.search.generated.jooq.DefaultSchema;
 import github.fekom.search.generated.jooq.Keys;
+import github.fekom.search.generated.jooq.Searchdb;
 import github.fekom.search.generated.jooq.tables.records.ProductsRecord;
 
 import java.math.BigDecimal;
@@ -39,7 +39,7 @@ public class Products extends TableImpl<ProductsRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>PRODUCTS</code>
+     * The reference instance of <code>searchdb.products</code>
      */
     public static final Products PRODUCTS = new Products();
 
@@ -52,49 +52,49 @@ public class Products extends TableImpl<ProductsRecord> {
     }
 
     /**
-     * The column <code>PRODUCTS.ID</code>.
+     * The column <code>searchdb.products.id</code>.
      */
-    public final TableField<ProductsRecord, String> ID = createField(DSL.name("ID"), SQLDataType.VARCHAR(32).nullable(false), this, "");
+    public final TableField<ProductsRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(32).nullable(false), this, "");
 
     /**
-     * The column <code>PRODUCTS.NAME</code>.
+     * The column <code>searchdb.products.name</code>.
      */
-    public final TableField<ProductsRecord, String> NAME = createField(DSL.name("NAME"), SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<ProductsRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
-     * The column <code>PRODUCTS.DESCRIPTION</code>.
+     * The column <code>searchdb.products.description</code>.
      */
-    public final TableField<ProductsRecord, String> DESCRIPTION = createField(DSL.name("DESCRIPTION"), SQLDataType.CLOB, this, "");
+    public final TableField<ProductsRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field("NULL", SQLDataType.CLOB)), this, "");
 
     /**
-     * The column <code>PRODUCTS.PRICE</code>.
+     * The column <code>searchdb.products.price</code>.
      */
-    public final TableField<ProductsRecord, BigDecimal> PRICE = createField(DSL.name("PRICE"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "");
+    public final TableField<ProductsRecord, BigDecimal> PRICE = createField(DSL.name("price"), SQLDataType.DECIMAL(10, 2).nullable(false), this, "");
 
     /**
-     * The column <code>PRODUCTS.STOCK</code>.
+     * The column <code>searchdb.products.stock</code>.
      */
-    public final TableField<ProductsRecord, Integer> STOCK = createField(DSL.name("STOCK"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field("0", SQLDataType.INTEGER)), this, "");
+    public final TableField<ProductsRecord, Integer> STOCK = createField(DSL.name("stock"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field("0", SQLDataType.INTEGER)), this, "");
 
     /**
-     * The column <code>PRODUCTS.CATEGORY</code>.
+     * The column <code>searchdb.products.category</code>.
      */
-    public final TableField<ProductsRecord, String> CATEGORY = createField(DSL.name("CATEGORY"), SQLDataType.VARCHAR(100), this, "");
+    public final TableField<ProductsRecord, String> CATEGORY = createField(DSL.name("category"), SQLDataType.VARCHAR(100).defaultValue(DSL.field("NULL", SQLDataType.VARCHAR)), this, "");
 
     /**
-     * The column <code>PRODUCTS.CREATED_AT</code>.
+     * The column <code>searchdb.products.created_at</code>.
      */
-    public final TableField<ProductsRecord, LocalDateTime> CREATED_AT = createField(DSL.name("CREATED_AT"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "");
+    public final TableField<ProductsRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(0).defaultValue(DSL.field("current_timestamp()", SQLDataType.LOCALDATETIME)), this, "");
 
     /**
-     * The column <code>PRODUCTS.UPDATED_AT</code>.
+     * The column <code>searchdb.products.updated_at</code>.
      */
-    public final TableField<ProductsRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("UPDATED_AT"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "");
+    public final TableField<ProductsRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(0).defaultValue(DSL.field("current_timestamp()", SQLDataType.LOCALDATETIME)), this, "");
 
     /**
-     * The column <code>PRODUCTS.TAGS</code>.
+     * The column <code>searchdb.products.tags</code>.
      */
-    public final TableField<ProductsRecord, String> TAGS = createField(DSL.name("TAGS"), SQLDataType.VARCHAR(500), this, "");
+    public final TableField<ProductsRecord, String> TAGS = createField(DSL.name("tags"), SQLDataType.VARCHAR(500).defaultValue(DSL.field("NULL", SQLDataType.VARCHAR)), this, "");
 
     private Products(Name alias, Table<ProductsRecord> aliased) {
         this(alias, aliased, null);
@@ -105,24 +105,24 @@ public class Products extends TableImpl<ProductsRecord> {
     }
 
     /**
-     * Create an aliased <code>PRODUCTS</code> table reference
+     * Create an aliased <code>searchdb.products</code> table reference
      */
     public Products(String alias) {
         this(DSL.name(alias), PRODUCTS);
     }
 
     /**
-     * Create an aliased <code>PRODUCTS</code> table reference
+     * Create an aliased <code>searchdb.products</code> table reference
      */
     public Products(Name alias) {
         this(alias, PRODUCTS);
     }
 
     /**
-     * Create a <code>PRODUCTS</code> table reference
+     * Create a <code>searchdb.products</code> table reference
      */
     public Products() {
-        this(DSL.name("PRODUCTS"), null);
+        this(DSL.name("products"), null);
     }
 
     public <O extends Record> Products(Table<O> child, ForeignKey<O, ProductsRecord> key) {
@@ -131,12 +131,12 @@ public class Products extends TableImpl<ProductsRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+        return aliased() ? null : Searchdb.SEARCHDB;
     }
 
     @Override
     public UniqueKey<ProductsRecord> getPrimaryKey() {
-        return Keys.CONSTRAINT_F;
+        return Keys.KEY_PRODUCTS_PRIMARY;
     }
 
     @Override

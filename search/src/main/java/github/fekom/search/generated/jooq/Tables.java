@@ -4,17 +4,23 @@
 package github.fekom.search.generated.jooq;
 
 
+import github.fekom.search.generated.jooq.tables.Databasechangeloglock;
 import github.fekom.search.generated.jooq.tables.Products;
 
 
 /**
- * Convenience access to all tables in the default schema.
+ * Convenience access to all tables in searchdb.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
 
     /**
-     * The table <code>PRODUCTS</code>.
+     * The table <code>searchdb.DATABASECHANGELOGLOCK</code>.
+     */
+    public static final Databasechangeloglock DATABASECHANGELOGLOCK = Databasechangeloglock.DATABASECHANGELOGLOCK;
+
+    /**
+     * The table <code>searchdb.products</code>.
      */
     public static final Products PRODUCTS = Products.PRODUCTS;
 }

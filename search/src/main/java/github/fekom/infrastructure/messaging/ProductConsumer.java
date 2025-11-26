@@ -1,6 +1,7 @@
 package github.fekom.infrastructure.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import github.fekom.application.dtos.ProductCreatedEvent;
 import github.fekom.application.service.ProductService;
 import github.fekom.domain.Product;
 import io.smallrye.reactive.messaging.annotations.Blocking;
@@ -26,13 +27,15 @@ public class ProductConsumer {
         try {
             LOG.infof("Received product-created event: %s", message);
 
-            Product product = objectMapper.readValue(message, Product.class);
+            ProductCreatedEvent event = objectMapper.readValue(message, ProductCreatedEvent.class);
 
             LOG.infof("Processing product creation: %s (ID: %s)",
-                    product.getName(),
-                    product.getId());
+                    event.name(),
+                    event.id());
 
-            productService.saveProduct(product);
+            Product product = toDomain(event);
+
+            productService.saveProductFromEvent(product);
 
             LOG.infof("Product created in search service: %s", product.getName());
 
@@ -47,13 +50,15 @@ public class ProductConsumer {
         try {
             LOG.infof("Received product-updated event: %s", message);
 
-            Product product = objectMapper.readValue(message, Product.class);
+            ProductCreatedEvent event = objectMapper.readValue(message, ProductCreatedEvent.class);
 
             LOG.infof("Processing product update: %s (ID: %s)",
-                    product.getName(),
-                    product.getId());
+                    event.name(),
+                    event.id());
 
-            productService.saveProduct(product); // save faz upsert
+            Product product = toDomain(event);
+
+            productService.saveProductFromEvent(product);
 
             LOG.infof("Product updated in search service: %s", product.getName());
 
@@ -69,14 +74,27 @@ public class ProductConsumer {
             LOG.infof("Received product-deleted event for ID: %s", productId);
 
 
-             String id = productId;
-
-            //productService.deleteProduct(id);
+            productService.deleteProduct(productId);
 
             LOG.infof("Product deleted from search service: %s", productId);
 
         } catch (Exception e) {
             LOG.errorf(e, "Failed to process product-deleted event for ID: %s", productId);
         }
+    }
+
+    private Product toDomain(ProductCreatedEvent event) {
+        return new Product(
+                event.id(),
+                event.name(),
+                event.price(),
+                event.stock(),
+                event.createAt(),
+                event.updateAt(),
+                event.tags(),
+                event.category(),
+                event.description()
+        );
+
     }
 }
