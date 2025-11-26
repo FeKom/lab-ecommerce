@@ -25,7 +25,7 @@ public class ProductsRecord extends UpdatableRecordImpl<ProductsRecord> implemen
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>PRODUCTS.ID</code>.
+     * Setter for <code>searchdb.products.id</code>.
      */
     public ProductsRecord setId(String value) {
         set(0, value);
@@ -33,14 +33,14 @@ public class ProductsRecord extends UpdatableRecordImpl<ProductsRecord> implemen
     }
 
     /**
-     * Getter for <code>PRODUCTS.ID</code>.
+     * Getter for <code>searchdb.products.id</code>.
      */
     public String getId() {
         return (String) get(0);
     }
 
     /**
-     * Setter for <code>PRODUCTS.NAME</code>.
+     * Setter for <code>searchdb.products.name</code>.
      */
     public ProductsRecord setName(String value) {
         set(1, value);
@@ -48,14 +48,14 @@ public class ProductsRecord extends UpdatableRecordImpl<ProductsRecord> implemen
     }
 
     /**
-     * Getter for <code>PRODUCTS.NAME</code>.
+     * Getter for <code>searchdb.products.name</code>.
      */
     public String getName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>PRODUCTS.DESCRIPTION</code>.
+     * Setter for <code>searchdb.products.description</code>.
      */
     public ProductsRecord setDescription(String value) {
         set(2, value);
@@ -63,14 +63,14 @@ public class ProductsRecord extends UpdatableRecordImpl<ProductsRecord> implemen
     }
 
     /**
-     * Getter for <code>PRODUCTS.DESCRIPTION</code>.
+     * Getter for <code>searchdb.products.description</code>.
      */
     public String getDescription() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>PRODUCTS.PRICE</code>.
+     * Setter for <code>searchdb.products.price</code>.
      */
     public ProductsRecord setPrice(BigDecimal value) {
         set(3, value);
@@ -78,14 +78,14 @@ public class ProductsRecord extends UpdatableRecordImpl<ProductsRecord> implemen
     }
 
     /**
-     * Getter for <code>PRODUCTS.PRICE</code>.
+     * Getter for <code>searchdb.products.price</code>.
      */
     public BigDecimal getPrice() {
         return (BigDecimal) get(3);
     }
 
     /**
-     * Setter for <code>PRODUCTS.STOCK</code>.
+     * Setter for <code>searchdb.products.stock</code>.
      */
     public ProductsRecord setStock(Integer value) {
         set(4, value);
@@ -93,14 +93,14 @@ public class ProductsRecord extends UpdatableRecordImpl<ProductsRecord> implemen
     }
 
     /**
-     * Getter for <code>PRODUCTS.STOCK</code>.
+     * Getter for <code>searchdb.products.stock</code>.
      */
     public Integer getStock() {
         return (Integer) get(4);
     }
 
     /**
-     * Setter for <code>PRODUCTS.CATEGORY</code>.
+     * Setter for <code>searchdb.products.category</code>.
      */
     public ProductsRecord setCategory(String value) {
         set(5, value);
@@ -108,14 +108,14 @@ public class ProductsRecord extends UpdatableRecordImpl<ProductsRecord> implemen
     }
 
     /**
-     * Getter for <code>PRODUCTS.CATEGORY</code>.
+     * Getter for <code>searchdb.products.category</code>.
      */
     public String getCategory() {
         return (String) get(5);
     }
 
     /**
-     * Setter for <code>PRODUCTS.CREATED_AT</code>.
+     * Setter for <code>searchdb.products.created_at</code>.
      */
     public ProductsRecord setCreatedAt(LocalDateTime value) {
         set(6, value);
@@ -123,14 +123,14 @@ public class ProductsRecord extends UpdatableRecordImpl<ProductsRecord> implemen
     }
 
     /**
-     * Getter for <code>PRODUCTS.CREATED_AT</code>.
+     * Getter for <code>searchdb.products.created_at</code>.
      */
     public LocalDateTime getCreatedAt() {
         return (LocalDateTime) get(6);
     }
 
     /**
-     * Setter for <code>PRODUCTS.UPDATED_AT</code>.
+     * Setter for <code>searchdb.products.updated_at</code>.
      */
     public ProductsRecord setUpdatedAt(LocalDateTime value) {
         set(7, value);
@@ -138,14 +138,14 @@ public class ProductsRecord extends UpdatableRecordImpl<ProductsRecord> implemen
     }
 
     /**
-     * Getter for <code>PRODUCTS.UPDATED_AT</code>.
+     * Getter for <code>searchdb.products.updated_at</code>.
      */
     public LocalDateTime getUpdatedAt() {
         return (LocalDateTime) get(7);
     }
 
     /**
-     * Setter for <code>PRODUCTS.TAGS</code>.
+     * Setter for <code>searchdb.products.tags</code>.
      */
     public ProductsRecord setTags(String value) {
         set(8, value);
@@ -153,7 +153,7 @@ public class ProductsRecord extends UpdatableRecordImpl<ProductsRecord> implemen
     }
 
     /**
-     * Getter for <code>PRODUCTS.TAGS</code>.
+     * Getter for <code>searchdb.products.tags</code>.
      */
     public String getTags() {
         return (String) get(8);

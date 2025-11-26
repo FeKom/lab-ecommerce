@@ -4,7 +4,9 @@
 package github.fekom.search.generated.jooq;
 
 
+import github.fekom.search.generated.jooq.tables.Databasechangeloglock;
 import github.fekom.search.generated.jooq.tables.Products;
+import github.fekom.search.generated.jooq.tables.records.DatabasechangeloglockRecord;
 import github.fekom.search.generated.jooq.tables.records.ProductsRecord;
 
 import org.jooq.TableField;
@@ -14,8 +16,8 @@ import org.jooq.impl.Internal;
 
 
 /**
- * A class modelling foreign key relationships and constraints of tables in the
- * default schema.
+ * A class modelling foreign key relationships and constraints of tables in
+ * searchdb.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Keys {
@@ -24,5 +26,6 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<ProductsRecord> CONSTRAINT_F = Internal.createUniqueKey(Products.PRODUCTS, DSL.name("CONSTRAINT_F"), new TableField[] { Products.PRODUCTS.ID }, true);
+    public static final UniqueKey<DatabasechangeloglockRecord> KEY_DATABASECHANGELOGLOCK_PRIMARY = Internal.createUniqueKey(Databasechangeloglock.DATABASECHANGELOGLOCK, DSL.name("KEY_DATABASECHANGELOGLOCK_PRIMARY"), new TableField[] { Databasechangeloglock.DATABASECHANGELOGLOCK.ID }, true);
+    public static final UniqueKey<ProductsRecord> KEY_PRODUCTS_PRIMARY = Internal.createUniqueKey(Products.PRODUCTS, DSL.name("KEY_products_PRIMARY"), new TableField[] { Products.PRODUCTS.ID }, true);
 }

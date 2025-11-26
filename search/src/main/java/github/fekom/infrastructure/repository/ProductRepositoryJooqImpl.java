@@ -3,15 +3,19 @@ package github.fekom.infrastructure.repository;
 
 import github.fekom.domain.Product;
 import github.fekom.domain.ProductRepository;
+import github.fekom.infrastructure.updateHelper.ProductUpdate;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jooq.DSLContext;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import github.fekom.search.generated.jooq.tables.Products;
 import github.fekom.search.generated.jooq.tables.records.ProductsRecord;
+import org.jooq.UpdateSetMoreStep;
 
 
 @ApplicationScoped
@@ -24,24 +28,21 @@ public class ProductRepositoryJooqImpl implements ProductRepository {
 
     @Override
     public Product save(Product product) {
-        ProductsRecord record = dsl.insertInto(PRODUCTS)
-                .set(PRODUCTS.ID, product.getId())
-                .set(PRODUCTS.NAME, product.getName())
-                .set(PRODUCTS.PRICE, product.getPrice())
-                .set(PRODUCTS.STOCK, product.getStock())
-                .set(PRODUCTS.TAGS, product.getTagsAsString())
-                .set(PRODUCTS.CREATED_AT, product.getCreatedAt())
-                .set(PRODUCTS.UPDATED_AT, product.getUpdatedAt())
-                .set(PRODUCTS.CATEGORY, product.getCategory())
-                .set(PRODUCTS.DESCRIPTION, product.getDescription())
+        ProductsRecord record = toRecord(product);
+        ProductsRecord savedRecord = dsl.insertInto(PRODUCTS)
+                .set(record)
                 .returning()
                 .fetchOne();
-        return toDomain(record);
+        return toDomain(savedRecord);
     }
 
     @Override
-    public Optional<Product> findById(UUID id) {
-        return Optional.empty();
+    public Optional<Product> findById(String id) {
+        ProductsRecord record = dsl.selectFrom(PRODUCTS)
+                .where(PRODUCTS.ID.eq(id))
+                .fetchOne();
+
+        return  Optional.ofNullable(toDomain(record));
     }
 
     @Override
@@ -55,18 +56,86 @@ public class ProductRepositoryJooqImpl implements ProductRepository {
     }
 
     @Override
-    public void update(Product product) {
-
+    public void delete(String id) {
+        ProductsRecord record = dsl.deleteFrom(PRODUCTS)
+                .where(PRODUCTS.ID.eq(id))
+                .returning()
+                .fetchOne();
     }
 
     @Override
-    public void delete(UUID id) {
-
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
+    public boolean existsById(String id) {
         return false;
+    }
+
+    @Override
+    public void update(Product product) {
+    }
+
+    public void updatePartial(UUID id, ProductUpdate update) {
+        if (!update.hasUpdates()) {
+            return;
+        }
+
+        UpdateSetMoreStep<ProductsRecord> updateQuery = (UpdateSetMoreStep<ProductsRecord>) dsl.update(PRODUCTS);
+
+        if (update.getName() != null) {
+            updateQuery = updateQuery.set(PRODUCTS.NAME, update.getName());
+        }
+
+        if (update.getPrice() != null) {
+            updateQuery = updateQuery.set(PRODUCTS.PRICE, update.getPrice());
+        }
+
+        if (update.getTags() != null) {
+            String tagsString = String.join(",", update.getTags());
+            updateQuery = updateQuery.set(PRODUCTS.TAGS, tagsString);
+        }
+
+        if(update.getStock() != null) {
+            updateQuery = updateQuery.set(PRODUCTS.STOCK, update.getStock());
+        }
+
+        if (update.getCategory() != null) {
+             updateQuery = updateQuery.set(PRODUCTS.CATEGORY, update.getCategory());
+        }
+        if(update.getDescription() != null) {
+            updateQuery = updateQuery.set(PRODUCTS.DESCRIPTION, update.getDescription());
+        }
+
+        updateQuery.set(PRODUCTS.UPDATED_AT, LocalDateTime.now())
+                .where(PRODUCTS.ID.eq(id.toString()))
+                .execute();
+    }
+
+    @Override
+    public void updateName(String id, String name) {
+
+    }
+
+    @Override
+    public void updatePrice(String id, BigDecimal price) {
+
+    }
+
+    @Override
+    public void updateTags(String id, List<String> tags) {
+
+    }
+
+    @Override
+    public void updateStock(String id, Integer stock) {
+
+    }
+
+    @Override
+    public void updateCategory(String id, String category) {
+
+    }
+
+    @Override
+    public void updateDescription(String id, String description) {
+
     }
 
 

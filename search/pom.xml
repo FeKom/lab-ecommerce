@@ -91,10 +91,6 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-flyway</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
             <scope>test</scope>
         </dependency>
@@ -165,23 +161,17 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <jdbc>
+                        <driver>org.mariadb.jdbc.Driver</driver>
+                        <url>jdbc:mariadb://localhost:3307/searchdb</url>
+                        <user>root</user>
+                        <password>root</password>
+                    </jdbc>
                     <generator>
                         <database>
-                            <name>org.jooq.meta.extensions.ddl.DDLDatabase</name>
-                            <properties>
-                                <property>
-                                    <key>scripts</key>
-                                    <value>src/main/resources/database/migration/*.sql</value>
-                                </property>
-                                <property>
-                                    <key>dialect</key>
-                                    <value>MYSQL</value>
-                                </property>
-                                <property>
-                                    <key>sort</key>
-                                    <value>flyway</value>
-                                </property>
-                            </properties>
+                            <name>org.jooq.meta.mariadb.MariaDBDatabase</name>
+                            <includes>.*</includes>
+                            <inputSchema>searchdb</inputSchema>
                         </database>
                         <generate>
                             <daos>false</daos>
