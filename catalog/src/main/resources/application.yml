@@ -1,12 +1,13 @@
 spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/catalog
   server:
     port: 8080
   application:
     name: catalog
   
-  data:
-    mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/catalog}
+
   
   kafka:
     topic: catalog-products

@@ -54,7 +54,7 @@ public class Products extends TableImpl<ProductsRecord> {
     /**
      * The column <code>searchdb.products.id</code>.
      */
-    public final TableField<ProductsRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(32).nullable(false), this, "");
+    public final TableField<ProductsRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(36).nullable(false), this, "");
 
     /**
      * The column <code>searchdb.products.name</code>.
@@ -64,7 +64,7 @@ public class Products extends TableImpl<ProductsRecord> {
     /**
      * The column <code>searchdb.products.description</code>.
      */
-    public final TableField<ProductsRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field("NULL", SQLDataType.CLOB)), this, "");
+    public final TableField<ProductsRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(320).defaultValue(DSL.field("NULL", SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>searchdb.products.price</code>.

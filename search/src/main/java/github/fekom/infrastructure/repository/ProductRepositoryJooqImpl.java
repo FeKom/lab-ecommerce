@@ -172,6 +172,9 @@ public class ProductRepositoryJooqImpl implements ProductRepository {
         record.setTags(product.getTagsAsString());
         record.setCreatedAt(product.getCreatedAt());
         record.setUpdatedAt(product.getUpdatedAt());
+        record.setCategory(product.getCategory());
+        record.setDescription(product.getDescription());
+        record.setStock(product.getStock());
         return record;
     }
 }

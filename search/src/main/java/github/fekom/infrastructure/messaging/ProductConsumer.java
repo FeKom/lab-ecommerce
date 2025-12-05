@@ -29,11 +29,27 @@ public class ProductConsumer {
 
             ProductCreatedEvent event = objectMapper.readValue(message, ProductCreatedEvent.class);
 
-            LOG.infof("Processing product creation: %s (ID: %s)",
+            if(event.category().isEmpty()) {
+                throw new RuntimeException("Erro no event caregory");
+            }
+
+            if(event.stock().equals(0)) {
+                throw new RuntimeException("Erro no event stock");
+            }
+
+            if(event.description().isEmpty()) {
+                throw new RuntimeException("Erro no event description");
+            }
+            LOG.infof("Processing product creation: %s (ID: %s), category: %s, description: %s, stock: %s",
                     event.name(),
-                    event.id());
+                    event.id(),
+                    event.category(),
+                    event.description(),
+                    event.stock());
 
             Product product = toDomain(event);
+
+            System.out.print("OQ ESTÁ VINDO NO PRODUCT ANTES DO SAVE PRODUCT FROM EVENT\n " + product);
 
             productService.saveProductFromEvent(product);
 
@@ -89,8 +105,8 @@ public class ProductConsumer {
                 event.name(),
                 event.price(),
                 event.stock(),
-                event.createAt(),
-                event.updateAt(),
+                event.createdAt(),
+                event.updatedAt(),
                 event.tags(),
                 event.category(),
                 event.description()

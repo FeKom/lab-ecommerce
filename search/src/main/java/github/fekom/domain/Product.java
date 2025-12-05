@@ -40,7 +40,7 @@ public class Product {
     }
 
     public Product(String name, BigDecimal price, Integer stock, LocalDateTime createdAt, LocalDateTime updatedAt, List<String> tags, String category, String description) {
-        this.id = UuidCreator.getTimeOrdered().toString();
+        this.id = UuidCreator.getTimeOrderedEpoch().toString();
         this.name = name;
         this.price = price;
         this.stock = stock;

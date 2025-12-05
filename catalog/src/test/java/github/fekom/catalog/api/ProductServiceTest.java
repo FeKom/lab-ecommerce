@@ -145,8 +145,8 @@ class ProductServiceTest {
         assertThat(updatedProduct.tags()).isEqualTo(tags2);
         assertThat(updatedProduct.category()).isEqualTo(Optional.of("Casa"));
         assertThat(updatedProduct.description()).isEqualTo(Optional.of("Nova versão do produto"));
-        assertThat(updatedProduct.createAt()).isEqualTo(product1.createAt());
-        assertThat(updatedProduct.updateAt()).isEqualTo(product1.updateAt());
+        assertThat(updatedProduct.createdAt()).isEqualTo(product1.createdAt());
+        assertThat(updatedProduct.updatedAt()).isEqualTo(product1.updatedAt());
     }
 
 //     @Test

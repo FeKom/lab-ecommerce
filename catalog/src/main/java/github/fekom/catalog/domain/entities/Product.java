@@ -2,10 +2,13 @@ package github.fekom.catalog.domain.entities;
 
 
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import github.fekom.catalog.api.dto.in.UpdateProductData;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
@@ -14,17 +17,16 @@ public record Product(String id,
                       String name,
                       BigDecimal price,
                       Integer stock,
-                      String createAt,
-                      String updateAt,
+                      LocalDateTime createdAt,
+                      LocalDateTime updatedAt,
                       List<String> tags,
                       String category,
                       String description) {
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     public static Product create(String name,
                                  BigDecimal price,
-                                 int stock,
+                                 Integer stock,
                                  List<String> tags,
                                  String category,
                                  String description) {
@@ -50,11 +52,10 @@ public record Product(String id,
         }
 
 
-        String now = LocalDateTime.now().format(formatter);
-        return new Product(UUID.randomUUID().toString(), name, price, stock, now, now, tags, category, description);
+        var now = LocalDateTime.now(ZoneId.systemDefault());
+        return new Product(UuidCreator.getTimeOrderedEpoch().toString(), name, price, stock, now, now, tags, category, description);
     }
 
-    //pega novos valores para os atributos e cria um novo product record mantendo o ID e o CREATEAT
     public Product withUpdatedDetails(UpdateProductData data) {
         if(data.name().length() < 2 || data.name().length() > 100) {
             throw new IllegalArgumentException("Name must be between 2 and 100 characters");
@@ -69,21 +70,20 @@ public record Product(String id,
         if(data.tags().isEmpty()) {
             throw new IllegalArgumentException("Tags cannot be null or empty");
         }
-        if(data.priceInCents() <= 0) {
+        if(data.price().signum() < 0 ) {
             throw new IllegalArgumentException("Price must be greater than zero");
         }
 
         if(data.stock() <= 0) {
             throw new IllegalArgumentException("Stock must be greater than zero");
         }
-        String updateAt = LocalDateTime.now().format(formatter);
         return new Product(
                 this.id,
                 name,
                 price,
                 stock,
-                this.createAt,
-                updateAt,
+                this.createdAt,
+                updatedAt,
                 tags,
                 category,
                 description);
@@ -95,15 +95,13 @@ public record Product(String id,
                 this.name,
                 this.price,
                 this.stock,
-                this.createAt,
-                this.updateAt,
+                this.createdAt,
+                this.updatedAt,
                 this.tags,
                 this.category,
                 this.description);
     }
     public Product withTimestamps(LocalDateTime createAt, LocalDateTime updateAt) {
-        String createdAtStr = createAt != null ? createAt.format(formatter) : this.createAt;
-        String updatedAtStr = updateAt != null ? updateAt.format(formatter) : this.updateAt;
-        return new Product(this.id, this.name, this.price, this.stock, createdAtStr, updatedAtStr, this.tags, this.category, this.description);
+        return new Product(this.id, this.name, this.price, this.stock, createdAt, updatedAt, this.tags, this.category, this.description);
     }
 }

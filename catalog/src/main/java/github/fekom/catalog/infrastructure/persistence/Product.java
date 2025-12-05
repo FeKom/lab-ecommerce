@@ -4,8 +4,11 @@ package github.fekom.catalog.infrastructure.persistence;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,10 +18,11 @@ public class Product {
     @Id
     private String id;
     private String name;
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal price;
     private Integer stock;
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private List<String> tags;
     private String category;
     private String description;
@@ -39,11 +43,11 @@ public class Product {
         this.name = name;
     }
 
-    public long getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(long price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -55,19 +59,19 @@ public class Product {
         this.stock = stock;
     }
 
-    public String getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(String updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -103,8 +107,8 @@ public class Product {
         entity.setName(domain.name());
         entity.setPrice(domain.price());
         entity.setStock(domain.stock());
-        entity.setCreatedAt(domain.createAt());
-        entity.setUpdatedAt(domain.updateAt());
+        entity.setCreatedAt(domain.createdAt());
+        entity.setUpdatedAt(domain.updatedAt());
         entity.setTags(domain.tags());
         entity.setCategory(domain.category());
         entity.setDescription(domain.description());
@@ -130,7 +134,7 @@ public class Product {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return stock == product.stock && Objects.equals(id, product.id) && Objects.equals(name, product.name) && Objects.equals(price, product.price) && Objects.equals(createdAt, product.createdAt) && Objects.equals(updatedAt, product.updatedAt) && Objects.equals(tags, product.tags) && Objects.equals(category, product.category) && Objects.equals(description, product.description);
+        return Objects.equals(stock, product.stock) && Objects.equals(id, product.id) && Objects.equals(name, product.name) && Objects.equals(price, product.price) && Objects.equals(createdAt, product.createdAt) && Objects.equals(updatedAt, product.updatedAt) && Objects.equals(tags, product.tags) && Objects.equals(category, product.category) && Objects.equals(description, product.description);
     }
 
     @Override
