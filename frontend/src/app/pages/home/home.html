@@ -1,0 +1,24 @@
+<div class="home-container">
+  <header class="hero">
+    <h1>🛒 {{ title }}</h1>
+    <p class="subtitle">O nosso cátalogo de produtos</p>
+  </header>
+
+  <div class="features-grid">
+    @for (feature of features; track feature.title) {
+      <a [routerLink]="feature.route" class="feature-card" [class]="feature.color">
+        <div class="feature-icon">{{ feature.icon }}</div>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.description }}</p>
+        <span class="feature-link">Acessar →</span>
+      </a>
+    }
+  </div>
+
+  <div class="quick-stats">
+    <div class="stat">
+      <span class="stat-number">0</span>
+      <span class="stat-label">Produtos Cadastrados</span>
+    </div>
+  </div>
+</div>

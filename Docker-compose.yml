@@ -89,11 +89,34 @@ services:
       - ecommerce-network
     restart: unless-stopped
 
+  frontend:
+    build: ./frontend
+    container_name: ecommerce-frontend
+    ports:
+      - "4200:4200"    
+      - "80:84"        
+    volumes:
+      - ./frontend:/app          
+      - /app/node_modules        
+    environment:
+      - NG_APP_CATALOG_API=http://localhost:8080
+      - NG_APP_SEARCH_API=http://localhost:8081
+    stdin_open: true  
+    tty: true          # Para cores no terminal
+    networks:
+      -  ecommerce-network
+    depends_on:
+      - catalog
+      - search
+
+
 networks:
   ecommerce-network:
     driver: bridge
 
 volumes:
+  forntend_node_modules:
+  frontend_data:
   mariadb_data:
   mongo_data:
   redis_data:

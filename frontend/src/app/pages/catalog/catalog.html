@@ -1,0 +1,29 @@
+<div class="catalog-container">
+  <header class="catalog-header">
+    <h1>📦 Catálogo de Produtos</h1>
+    <p>Gerencie todos os produtos do sistema</p>
+
+    <div class="header-actions">
+      <button (click)="toggleForm()" class="btn-primary">
+        {{ showForm ? '↩️ Voltar para Lista' : '➕ Adicionar Produto' }}
+      </button>
+      <a routerLink="/" class="btn-secondary">🏠 Voltar para Home</a>
+    </div>
+  </header>
+
+  <main class="catalog-main">
+    @if (showForm) {
+      <div class="form-section">
+        <h2>Cadastrar Novo Produto</h2>
+        <!-- Formulário será inserido aqui -->
+        <p>Formulário de cadastro será implementado aqui...</p>
+      </div>
+    } @else {
+      <div class="list-section">
+        <h2>Lista de Produtos</h2>
+        <!-- Lista de produtos será inserida aqui -->
+        <p>Lista de produtos será implementada aqui...</p>
+      </div>
+    }
+  </main>
+</div>
