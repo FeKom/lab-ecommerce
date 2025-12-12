@@ -104,6 +104,25 @@ services:
       - ecommerce-network
     restart: unless-stopped
 
+  user-service:
+    build:
+      context: user/
+      dockerfile: Dockerfile
+    container_name: user-service
+    env_file:
+      - user/.env.docker
+    depends_on:
+      - postgres
+    ports:
+      - "8085:8085"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users_service
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
   # frontend:
   #   build: ./frontend
   #   container_name: ecommerce-frontend
@@ -129,6 +148,7 @@ networks:
     driver: bridge
 
 volumes:
+  user_data:
   postgres_data:
   forntend_node_modules:
   frontend_data:
