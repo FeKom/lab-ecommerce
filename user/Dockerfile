@@ -1,10 +1,10 @@
-FROM oven/bun as build
+FROM oven/bun AS build
 WORKDIR /app
 
 COPY package.json package.json
 COPY bun.lock bun.lock
-COPY tsconfig.json tsconfig.json
 RUN bun install
+COPY tsconfig.json tsconfig.json
 COPY ./src ./src
 COPY ./build.ts ./build.ts
 RUN bun build.ts
@@ -14,4 +14,4 @@ WORKDIR /app
 COPY --from=build /app/build/server server
 ENV NODE_ENV=production
 CMD ["./server"]
-EXPOSE 3000
+EXPOSE 8085
