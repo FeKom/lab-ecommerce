@@ -8,12 +8,25 @@ export const auth = betterAuth({
   plugins: [openAPI()],
   database: pool,
   emailAndPassword: {
+    requireEmailVerification: true,
     enabled: true,
     password: {
-      hash: async (password: string)  =>  await Bun.password.hash(password, "argon2id"), 
-      verify: async ({password, hash}: {password: string, hash: string}) => 
-        await Bun.password.verify(password, hash),
+      // Usar async/await para hashing assíncrono
+      // argon2id é o algoritmo mais seguro e recomendado (resistente a ataques com GPU/ASIC)
+      hash: async (password: string) => {
+        return await Bun.password.hash(password, {
+          algorithm: "argon2id", // Algoritmo mais seguro que bcrypt
+          memoryCost: 65536, // 64 MB de memória (maior = mais seguro)
+          timeCost: 3, // Número de iterações (maior = mais seguro, mas mais lento)
+        });
+      },
+      verify: async ({ password, hash }: { password: string; hash: string }) => {
+        return await Bun.password.verify(password, hash);
+      },
     },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
   },
   session: {
     modelName: "sessions",
@@ -25,6 +38,9 @@ export const auth = betterAuth({
   },
   user: {
     modelName: "users",
+    fields: {
+      emailVerified: "email_verified",
+    },
     additionalFields: {
       phone: {
         type: "string",
