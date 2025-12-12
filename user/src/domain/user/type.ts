@@ -1,15 +1,17 @@
 export type User = {
   id: string;
   email: string;
+  emailVerified: boolean;
   name: string;
   age?: number;
   phone: string;
-  passwordHash: string;
+  password: string;
   role: UserRole;
+  image?: string;
   active: boolean;
+  productsId?: string[];
   createdAt: Date;
   updatedAt: Date;
-  productsIds?: string[];
 };
 
 type UserRole = "user" | "admin" | "seller";
