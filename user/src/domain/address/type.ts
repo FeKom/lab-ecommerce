@@ -9,6 +9,6 @@ export type address = {
   county: string;
   complement: string | null;
   active: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 };

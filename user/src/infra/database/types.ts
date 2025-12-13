@@ -11,17 +11,18 @@ address: AddressTable;
 }
 
 export interface AddressTable {
-    id: Generated<string>;
-    userId: string
+    id: string;
+    user_id: string;
+    name: string;
+    number: number;
     street: string;
-    number: string;
-    complement: string
-    city: string;
     state: string;
-    zipCode: string;
-    createdAt: ColumnType<Date, string | undefined, never>
-    updatedAt: ColumnType<Date, string | undefined, string>
-
+    zip_code: string;
+    country: string;
+    complement: string | null;
+    active: boolean;
+    created_at: ColumnType<Date, string | undefined, never>;
+    updated_at: ColumnType<Date, string | undefined, string>;
 }
 
 export type Address = Selectable<AddressTable>;
