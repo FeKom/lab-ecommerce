@@ -4,9 +4,7 @@
 package github.fekom.search.generated.jooq;
 
 
-import github.fekom.search.generated.jooq.tables.Databasechangeloglock;
 import github.fekom.search.generated.jooq.tables.Products;
-import github.fekom.search.generated.jooq.tables.records.DatabasechangeloglockRecord;
 import github.fekom.search.generated.jooq.tables.records.ProductsRecord;
 
 import org.jooq.TableField;
@@ -26,6 +24,5 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<DatabasechangeloglockRecord> KEY_DATABASECHANGELOGLOCK_PRIMARY = Internal.createUniqueKey(Databasechangeloglock.DATABASECHANGELOGLOCK, DSL.name("KEY_DATABASECHANGELOGLOCK_PRIMARY"), new TableField[] { Databasechangeloglock.DATABASECHANGELOGLOCK.ID }, true);
     public static final UniqueKey<ProductsRecord> KEY_PRODUCTS_PRIMARY = Internal.createUniqueKey(Products.PRODUCTS, DSL.name("KEY_products_PRIMARY"), new TableField[] { Products.PRODUCTS.ID }, true);
 }

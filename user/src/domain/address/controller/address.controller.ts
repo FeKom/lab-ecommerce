@@ -35,6 +35,7 @@ export const addressController = new Elysia({ prefix: "/api/addresses" })
         state: body.state,
         zip_code: body.zip_code,
         country: body.country,
+        active: true,
         complement: body.complement,
       });
 
@@ -68,7 +69,7 @@ export const addressController = new Elysia({ prefix: "/api/addresses" })
     });
 
     if (!session) {
-      return context.status(401).send({ error: "Não autenticado" });
+      return context.status("Unauthorized");
     }
 
     const { id } = context.params;
@@ -95,7 +96,7 @@ export const addressController = new Elysia({ prefix: "/api/addresses" })
     });
 
     if (!session) {
-      return context.status(401).send({ error: "Não autenticado" });
+      return context.status("Unauthorized");
     }
 
     const { id } = context.params;

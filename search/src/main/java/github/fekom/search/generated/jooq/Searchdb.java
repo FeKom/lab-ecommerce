@@ -4,7 +4,6 @@
 package github.fekom.search.generated.jooq;
 
 
-import github.fekom.search.generated.jooq.tables.Databasechangeloglock;
 import github.fekom.search.generated.jooq.tables.Products;
 
 import java.util.Arrays;
@@ -29,11 +28,6 @@ public class Searchdb extends SchemaImpl {
     public static final Searchdb SEARCHDB = new Searchdb();
 
     /**
-     * The table <code>searchdb.DATABASECHANGELOGLOCK</code>.
-     */
-    public final Databasechangeloglock DATABASECHANGELOGLOCK = Databasechangeloglock.DATABASECHANGELOGLOCK;
-
-    /**
      * The table <code>searchdb.products</code>.
      */
     public final Products PRODUCTS = Products.PRODUCTS;
@@ -54,7 +48,6 @@ public class Searchdb extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
-            Databasechangeloglock.DATABASECHANGELOGLOCK,
             Products.PRODUCTS
         );
     }

@@ -4,7 +4,6 @@
 package github.fekom.search.generated.jooq;
 
 
-import github.fekom.search.generated.jooq.tables.Databasechangeloglock;
 import github.fekom.search.generated.jooq.tables.Products;
 
 
@@ -13,11 +12,6 @@ import github.fekom.search.generated.jooq.tables.Products;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
-
-    /**
-     * The table <code>searchdb.DATABASECHANGELOGLOCK</code>.
-     */
-    public static final Databasechangeloglock DATABASECHANGELOGLOCK = Databasechangeloglock.DATABASECHANGELOGLOCK;
 
     /**
      * The table <code>searchdb.products</code>.

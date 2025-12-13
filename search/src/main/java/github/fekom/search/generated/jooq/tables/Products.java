@@ -64,7 +64,7 @@ public class Products extends TableImpl<ProductsRecord> {
     /**
      * The column <code>searchdb.products.description</code>.
      */
-    public final TableField<ProductsRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(320).defaultValue(DSL.field("NULL", SQLDataType.VARCHAR)), this, "");
+    public final TableField<ProductsRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field("NULL", SQLDataType.CLOB)), this, "");
 
     /**
      * The column <code>searchdb.products.price</code>.
@@ -82,6 +82,11 @@ public class Products extends TableImpl<ProductsRecord> {
     public final TableField<ProductsRecord, String> CATEGORY = createField(DSL.name("category"), SQLDataType.VARCHAR(100).defaultValue(DSL.field("NULL", SQLDataType.VARCHAR)), this, "");
 
     /**
+     * The column <code>searchdb.products.tags</code>.
+     */
+    public final TableField<ProductsRecord, String> TAGS = createField(DSL.name("tags"), SQLDataType.VARCHAR(500).defaultValue(DSL.field("NULL", SQLDataType.VARCHAR)), this, "");
+
+    /**
      * The column <code>searchdb.products.created_at</code>.
      */
     public final TableField<ProductsRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(0).defaultValue(DSL.field("current_timestamp()", SQLDataType.LOCALDATETIME)), this, "");
@@ -90,11 +95,6 @@ public class Products extends TableImpl<ProductsRecord> {
      * The column <code>searchdb.products.updated_at</code>.
      */
     public final TableField<ProductsRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(0).defaultValue(DSL.field("current_timestamp()", SQLDataType.LOCALDATETIME)), this, "");
-
-    /**
-     * The column <code>searchdb.products.tags</code>.
-     */
-    public final TableField<ProductsRecord, String> TAGS = createField(DSL.name("tags"), SQLDataType.VARCHAR(500).defaultValue(DSL.field("NULL", SQLDataType.VARCHAR)), this, "");
 
     private Products(Name alias, Table<ProductsRecord> aliased) {
         this(alias, aliased, null);
@@ -183,14 +183,14 @@ public class Products extends TableImpl<ProductsRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<String, String, String, BigDecimal, Integer, String, LocalDateTime, LocalDateTime, String> fieldsRow() {
+    public Row9<String, String, String, BigDecimal, Integer, String, String, LocalDateTime, LocalDateTime> fieldsRow() {
         return (Row9) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function9<? super String, ? super String, ? super String, ? super BigDecimal, ? super Integer, ? super String, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function9<? super String, ? super String, ? super String, ? super BigDecimal, ? super Integer, ? super String, ? super String, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -198,7 +198,7 @@ public class Products extends TableImpl<ProductsRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super String, ? super String, ? super String, ? super BigDecimal, ? super Integer, ? super String, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function9<? super String, ? super String, ? super String, ? super BigDecimal, ? super Integer, ? super String, ? super String, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }
