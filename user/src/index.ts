@@ -1,6 +1,8 @@
 import openapi from "@elysiajs/openapi";
 import Elysia from "elysia";
 import {auth, OpenAPI} from "./lib/auth"
+import { userController } from "./domain/user/controller/user.controller";
+import { addressController } from "./domain/address/controller/address.controller";
 
 const betterAuth = new Elysia({ name: "better-auth" })
   .mount(auth.handler)
@@ -28,7 +30,10 @@ const app = new Elysia()
   }
   ))
   .use(betterAuth)
+  .use(userController)
+  .use(addressController)
   .get("/", () => "Hello Elysia")
+  .get("/health", () => ({ status: "ok" }))
   .listen(6060);
 
 console.log(
