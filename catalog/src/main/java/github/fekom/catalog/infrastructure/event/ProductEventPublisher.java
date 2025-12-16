@@ -17,7 +17,16 @@ public class ProductEventPublisher {
 
 
     public void publishProductCreatedEvent(Product product) {
-        kafkaTemplate.send(CREATE_TOPIC, product.id(), product);
+        try {
+            if(product.id().isEmpty()) {
+                throw new RuntimeException();
+            } else {
+                kafkaTemplate.send(CREATE_TOPIC, product.id(), product);
+            }
+
+        } catch (Exception e) {
+            
+        }
     }
 
     public void publishProductUpdatedEvent(Product product) {

@@ -9,7 +9,6 @@ export type User = {
   role: UserRole;
   image?: string;
   active: boolean;
-  productsId?: string[];
   createdAt: Date;
   updatedAt: Date;
 };

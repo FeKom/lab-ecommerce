@@ -53,12 +53,6 @@ export const auth = betterAuth({
         defaultValue: true,
         input: false,
       },
-      productsId: {
-        type: "string[]",
-        required: false,
-        input: false,
-        fieldName: "product_id",
-      },
       role: {
         type: "string",
         required: true,
