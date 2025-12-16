@@ -1,11 +1,12 @@
 package github.fekom.catalog.api.dto.in;
 
-import github.fekom.catalog.domain.entities.Product;
 import jakarta.validation.constraints.*;
 
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import github.fekom.catalog.domain.entities.Product;
 
 public record CreateProductRequest (
     @NotBlank(message = "Product name cannot be blank")
@@ -19,8 +20,11 @@ public record CreateProductRequest (
     @NotNull(message = "Tags cannot be null")
     List<String> tags,
     String category,
-    String description
+    String description,
+    @NotBlank(message = "User ID cannot be blank")
+    String userId
 ) {
+
 
         // Converte o DTO para uma entidade de domínio Product
         public Product toDomainEntity() {
@@ -30,7 +34,8 @@ public record CreateProductRequest (
                     this.stock,
                     this.tags,
                     this.category,
-                    this.description
+                    this.description,
+                    this.userId
             );
         }
     }

@@ -26,6 +26,7 @@ public class Product {
     private List<String> tags;
     private String category;
     private String description;
+    private String userId;
 
     public String getId() {
         return id;
@@ -98,6 +99,13 @@ public class Product {
     public void setDescription(String description) {
         this.description = description;
     }
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     //construtor statico
     public static Product fromDomain(github.fekom.catalog.domain.entities.Product domain) {
@@ -112,6 +120,7 @@ public class Product {
         entity.setTags(domain.tags());
         entity.setCategory(domain.category());
         entity.setDescription(domain.description());
+        entity.setUserId(domain.userId());
 
         return entity;
     }
@@ -126,7 +135,8 @@ public class Product {
                 getUpdatedAt(),
                 getTags(),
                 getCategory(),
-                getDescription());
+                getDescription(),
+                getUserId());
     }
 
 
@@ -134,12 +144,12 @@ public class Product {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return Objects.equals(stock, product.stock) && Objects.equals(id, product.id) && Objects.equals(name, product.name) && Objects.equals(price, product.price) && Objects.equals(createdAt, product.createdAt) && Objects.equals(updatedAt, product.updatedAt) && Objects.equals(tags, product.tags) && Objects.equals(category, product.category) && Objects.equals(description, product.description);
+        return Objects.equals(stock, product.stock) && Objects.equals(id, product.id) && Objects.equals(name, product.name) && Objects.equals(price, product.price) && Objects.equals(createdAt, product.createdAt) && Objects.equals(updatedAt, product.updatedAt) && Objects.equals(tags, product.tags) && Objects.equals(category, product.category) && Objects.equals(description, product.description) && Objects.equals(userId, product.userId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, price, stock, createdAt, updatedAt, tags, category, description);
+        return Objects.hash(id, name, price, stock, createdAt, updatedAt, tags, category, description, userId);
     }
 
 }

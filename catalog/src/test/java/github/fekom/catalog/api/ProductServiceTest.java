@@ -2,6 +2,7 @@ package github.fekom.catalog.api;
 
 import github.fekom.catalog.domain.entities.Product;
 import github.fekom.catalog.domain.entities.ProductRepository;
+import github.fekom.catalog.infrastructure.event.ProductEventPublisher;
 import org.instancio.Instancio;
 import org.instancio.Select;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,9 @@ class ProductServiceTest {
 
     @Mock
     ProductRepository repository;
+
+    @Mock
+    ProductEventPublisher eventPublisher;
 
 
     @Test
@@ -110,7 +114,8 @@ class ProductServiceTest {
                         10,
                         tags,
                         "Eletrônicos",
-                        "Produto original de fábrica"
+                        "Produto original de fábrica",
+                        "random userID uuidV7"
                 ).withId(productId)
                 .withTimestamps(
                         LocalDateTime.of(2023, 1, 1, 0, 0, 0),
@@ -123,7 +128,8 @@ class ProductServiceTest {
                 5,
                 tags2,
                 "Casa",
-                "Nova versão do produto"
+                "Nova versão do produto",
+                "OUTRO RANDOM USERID V7"
         );
 
         when(repository.findById(product1.id())).thenReturn(Optional.of(product1));

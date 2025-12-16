@@ -6,12 +6,9 @@ import com.github.f4b6a3.uuid.UuidCreator;
 import github.fekom.catalog.api.dto.in.UpdateProductData;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 
 public record Product(String id,
                       String name,
@@ -21,7 +18,8 @@ public record Product(String id,
                       LocalDateTime updatedAt,
                       List<String> tags,
                       String category,
-                      String description) {
+                      String description,
+                      String userId) {
 
 
     public static Product create(String name,
@@ -29,7 +27,9 @@ public record Product(String id,
                                  Integer stock,
                                  List<String> tags,
                                  String category,
-                                 String description) {
+                                 String description,
+                                 String userId
+                                ) {
 
         if(name.length() < 2 || name.length() > 100) {
             throw new IllegalArgumentException("Name must be between 2 and 100 characters");
@@ -51,9 +51,12 @@ public record Product(String id,
             throw new IllegalArgumentException("Stock must be greater than zero");
         }
 
+        if(userId == null || userId.trim().isEmpty()) {
+            throw new IllegalArgumentException("User ID cannot be null or empty");
+        }
 
         var now = LocalDateTime.now(ZoneId.systemDefault());
-        return new Product(UuidCreator.getTimeOrderedEpoch().toString(), name, price, stock, now, now, tags, category, description);
+        return new Product(UuidCreator.getTimeOrderedEpoch().toString(), name, price, stock, now, now, tags, category, description, userId);
     }
 
     public Product withUpdatedDetails(UpdateProductData data) {
@@ -86,7 +89,8 @@ public record Product(String id,
                 updatedAt,
                 tags,
                 category,
-                description);
+                description,
+                this.userId);
     }
 
     public Product withId(String newId) {
@@ -99,9 +103,11 @@ public record Product(String id,
                 this.updatedAt,
                 this.tags,
                 this.category,
-                this.description);
+                this.description,
+                this.userId);
     }
     public Product withTimestamps(LocalDateTime createAt, LocalDateTime updateAt) {
-        return new Product(this.id, this.name, this.price, this.stock, createdAt, updatedAt, this.tags, this.category, this.description);
+        return new Product(this.id, this.name, this.price, this.stock, createAt, updateAt, this.tags, this.category, this.description, this.userId);
     }
+
 }
