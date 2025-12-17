@@ -8,6 +8,8 @@ import github.fekom.catalog.domain.entities.Product;
 import github.fekom.catalog.utils.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+
     private final ProductService service;
     private final AuthUtils authUtils;
 
@@ -30,13 +34,17 @@ public class ProductController {
             @Valid @RequestBody CreateProductRequest requestDTO,
             HttpServletRequest request) {
 
+        logger.info("Recebida requisição para criar produto: {}", requestDTO.name());
+
         // Verificar se o usuário está autenticado e extrair userId
         var userIdOptional = authUtils.extractUserId(request);
         if (userIdOptional.isEmpty()) {
+            logger.warn("Falha na autenticação - retornando 401");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         String userId = userIdOptional.get();
+        logger.info("Usuário autenticado: {}", userId);
 
         // Criar novo request com o userId extraído da sessão
         CreateProductRequest authenticatedRequest = new CreateProductRequest(
@@ -49,8 +57,10 @@ public class ProductController {
             userId
         );
 
+        logger.debug("Criando produto com dados autenticados");
         Product product = authenticatedRequest.toDomainEntity();
         service.createOneProduct(product);
+        logger.info("Produto criado com sucesso: {}", product.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(ProductResponse.fromDomainEntity(product));
     }
 

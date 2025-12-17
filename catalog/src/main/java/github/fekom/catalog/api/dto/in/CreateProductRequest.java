@@ -21,7 +21,6 @@ public record CreateProductRequest (
     List<String> tags,
     String category,
     String description,
-    @NotBlank(message = "User ID cannot be blank")
     String userId
 ) {
 
