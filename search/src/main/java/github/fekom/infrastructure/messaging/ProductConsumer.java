@@ -109,7 +109,8 @@ public class ProductConsumer {
                 event.updatedAt(),
                 event.tags(),
                 event.category(),
-                event.description()
+                event.description(),
+                event.userId()
         );
 
     }

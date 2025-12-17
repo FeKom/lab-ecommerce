@@ -2,14 +2,12 @@ package github.fekom.domain;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 
 public class Product {
     private String id;
@@ -21,25 +19,20 @@ public class Product {
     private List<String> tags;
     private String category;
     private String description;
-
-    public Product(){}
+    private String userId;
 
     @Override
     public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", stock=" + stock +
-                ", createAt='" + createdAt + '\'' +
-                ", updateAt='" + updatedAt + '\'' +
-                ", tags=" + tags +
-                ", category='" + category + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+        return "Product [id=" + id + ", name=" + name + ", price=" + price + ", stock=" + stock + ", createdAt="
+                + createdAt + ", updatedAt=" + updatedAt + ", tags=" + tags + ", category=" + category
+                + ", description=" + description + ", userId=" + userId + "]";
     }
 
-    public Product(String name, BigDecimal price, Integer stock, LocalDateTime createdAt, LocalDateTime updatedAt, List<String> tags, String category, String description) {
+    public Product() {
+    }
+
+    public Product(String name, BigDecimal price, Integer stock, LocalDateTime createdAt, LocalDateTime updatedAt,
+            List<String> tags, String category, String description, String userId) {
         this.id = UuidCreator.getTimeOrderedEpoch().toString();
         this.name = name;
         this.price = price;
@@ -49,9 +42,11 @@ public class Product {
         this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
         this.category = category;
         this.description = description;
+        this.userId = userId;
     }
 
-    public Product(String id, String name, BigDecimal price, Integer stock, LocalDateTime createdAt, LocalDateTime updatedAt, List<String> tags, String category, String description) {
+    public Product(String id, String name, BigDecimal price, Integer stock, LocalDateTime createdAt,
+            LocalDateTime updatedAt, List<String> tags, String category, String description, String userId) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -61,6 +56,7 @@ public class Product {
         this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
         this.category = category;
         this.description = description;
+        this.userId = userId;
     }
 
     public String getId() {
@@ -133,6 +129,14 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+       return userId;
     }
 
     public String getTagsAsString() {

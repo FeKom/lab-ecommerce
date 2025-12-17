@@ -19,6 +19,8 @@ public record ProductCreatedEvent(
 
         @JsonProperty("category") String category,
 
-        @JsonProperty("description") String description
+        @JsonProperty("description") String description,
+
+        @JsonProperty("userId") String userId
 ) {
 }
