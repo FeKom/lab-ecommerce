@@ -70,6 +70,11 @@ public class ProductRepositoryJooqImpl implements ProductRepository {
 
     @Override
     public void update(Product product) {
+        ProductsRecord record = toRecord(product);
+        dsl.update(PRODUCTS)
+                .set(record)
+                .where(PRODUCTS.ID.eq(product.getId()))
+                .execute();
     }
 
     public void updatePartial(UUID id, ProductUpdate update) {
@@ -160,7 +165,8 @@ public class ProductRepositoryJooqImpl implements ProductRepository {
                 record.getUpdatedAt(),
                 tags,
                 record.getDescription(),
-                record.getCategory()
+                record.getCategory(),
+                record.getUserId()
         );
     }
 
@@ -175,6 +181,7 @@ public class ProductRepositoryJooqImpl implements ProductRepository {
         record.setCategory(product.getCategory());
         record.setDescription(product.getDescription());
         record.setStock(product.getStock());
+        record.setUserId(product.getUserId());
         return record;
     }
 }

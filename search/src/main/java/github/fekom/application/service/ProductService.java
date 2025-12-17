@@ -52,7 +52,8 @@ public class ProductService {
                 existing.getUpdatedAt(),
                 newTags,
                 newCategory,
-                newDescription
+                newDescription,
+                existing.getUserId()
         );
     }
 
