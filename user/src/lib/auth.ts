@@ -25,9 +25,11 @@ export const auth = betterAuth({
       },
     },
   },
-  emailVerification: {
-    sendOnSignUp: true,
-  },
+  // Desabilitado para desenvolvimento
+  // emailVerification: {
+  //   sendOnSignUp: false,
+  //   requireEmailVerification: false,
+  // },
   session: {
     modelName: "sessions",
     expiresIn: 60 * 60 * 24 * 7,
@@ -70,8 +72,8 @@ export const auth = betterAuth({
     level: "debug"
   },
   basePath: "/api/auth",
-  baseURL: process.env.AUTH_BASE_URL,
-  secret: process.env.AUTH_SECRET,
+  baseURL: "http://localhost:3000",
+  secret: process.env.AUTH_SECRET || "KODs6oh4z2c6NMVdzUVWGBy5ghnMU1cv7a1Jc135Y7k=",
 });
 
 

@@ -15,7 +15,8 @@ public record ProductResponse(
         LocalDateTime updatedAt,
         List<String> tags,
         String category,
-        String description
+        String description,
+        String userId
 ) {
     public static ProductResponse fromDomainEntity(Product product) {
         //formatar o preço de volta para String
@@ -29,7 +30,8 @@ public record ProductResponse(
                 product.updatedAt(),
                 product.tags(),
                 product.category(),
-                product.description()
+                product.description(),
+                product.userId()
         );
     }
 }

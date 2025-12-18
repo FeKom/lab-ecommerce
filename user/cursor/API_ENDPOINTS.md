@@ -12,7 +12,7 @@
 ### Exemplo de Sign-Up
 
 ```bash
-curl -X POST http://localhost:6060/api/auth/sign-up/email \
+curl -X POST http://localhost:3000/api/auth/sign-up/email \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -25,7 +25,7 @@ curl -X POST http://localhost:6060/api/auth/sign-up/email \
 ### Exemplo de Sign-In
 
 ```bash
-curl -X POST http://localhost:6060/api/auth/sign-in/email \
+curl -X POST http://localhost:3000/api/auth/sign-in/email \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -43,7 +43,7 @@ curl -X POST http://localhost:6060/api/auth/sign-in/email \
 ### Exemplo: Obter informações do usuário
 
 ```bash
-curl -X GET http://localhost:6060/api/users/me \
+curl -X GET http://localhost:3000/api/users/me \
   -H "Cookie: better-auth.session_token=abc123..."
 ```
 
@@ -75,7 +75,7 @@ curl -X GET http://localhost:6060/api/users/me \
 ### Exemplo: Criar endereço
 
 ```bash
-curl -X POST http://localhost:6060/api/addresses \
+curl -X POST http://localhost:3000/api/addresses \
   -H "Content-Type: application/json" \
   -H "Cookie: better-auth.session_token=abc123..." \
   -d '{
@@ -110,7 +110,7 @@ curl -X POST http://localhost:6060/api/addresses \
 ### Exemplo: Listar endereços
 
 ```bash
-curl -X GET http://localhost:6060/api/addresses \
+curl -X GET http://localhost:3000/api/addresses \
   -H "Cookie: better-auth.session_token=abc123..."
 ```
 
@@ -131,7 +131,7 @@ curl -X GET http://localhost:6060/api/addresses \
 ### Exemplo: Atualizar endereço
 
 ```bash
-curl -X PUT http://localhost:6060/api/addresses/019b1391-7aa2-7c4b-bc85-0e079de103c0 \
+curl -X PUT http://localhost:3000/api/addresses/019b1391-7aa2-7c4b-bc85-0e079de103c0 \
   -H "Content-Type: application/json" \
   -H "Cookie: better-auth.session_token=abc123..." \
   -d '{
@@ -143,7 +143,7 @@ curl -X PUT http://localhost:6060/api/addresses/019b1391-7aa2-7c4b-bc85-0e079de1
 ### Exemplo: Deletar endereço
 
 ```bash
-curl -X DELETE http://localhost:6060/api/addresses/019b1391-7aa2-7c4b-bc85-0e079de103c0 \
+curl -X DELETE http://localhost:3000/api/addresses/019b1391-7aa2-7c4b-bc85-0e079de103c0 \
   -H "Cookie: better-auth.session_token=abc123..."
 ```
 
@@ -161,11 +161,11 @@ O cookie é definido automaticamente após o login via `/api/auth/sign-in/email`
 
 Acesse a documentação Swagger em:
 ```
-http://localhost:6060/
+http://localhost:3000/
 ```
 
 Ou visualize os endpoints em:
 ```
-http://localhost:6060/openapi
+http://localhost:3000/openapi
 ```
 
