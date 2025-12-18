@@ -13,7 +13,7 @@ npm install better-auth
 import { createAuthClient } from "better-auth/react"; // ou "better-auth/angular" se usar Angular
 
 export const authClient = createAuthClient({
-  baseURL: "http://localhost:6060", // URL do seu backend
+  baseURL: "http://localhost:3000", // URL do seu backend
   basePath: "/api/auth", // caminho base configurado no backend
 });
 ```
@@ -76,7 +76,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AuthService {
   private authClient = createAuthClient({
-    baseURL: 'http://localhost:6060',
+    baseURL: 'http://localhost:3000',
     basePath: '/api/auth',
   });
 

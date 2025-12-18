@@ -296,7 +296,7 @@ Cookie: better-auth.session_token=abc123...
 ```typescript
 // Frontend (Angular/React)
 const authClient = createAuthClient({
-  baseURL: "http://localhost:6060"
+  baseURL: "http://localhost:3000"
 });
 
 // Fazer login
