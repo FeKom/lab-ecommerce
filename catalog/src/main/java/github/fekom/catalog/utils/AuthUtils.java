@@ -18,7 +18,7 @@ public class AuthUtils {
 
     private final RestTemplate restTemplate;
 
-    @Value("${user.service.url:http://localhost:6060}")
+    @Value("${user.service.url:http://localhost:3000}")
     private String userServiceUrl;
 
     public AuthUtils(RestTemplate restTemplate) {
@@ -47,11 +47,11 @@ public class AuthUtils {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Cookie", cookieHeader);
             HttpEntity<?> entity = new HttpEntity<>(headers);
-            logger.debug("Preparando chamada para user service: {}", userServiceUrl + "/api/auth/get-session");
+            logger.debug("Preparando chamada para user service: {}", userServiceUrl + "/api/users/session");
 
             // 3. Fazer chamada para validar sessão
             ResponseEntity<Map> response = restTemplate.exchange(
-                userServiceUrl + "/api/auth/get-session",
+                userServiceUrl + "/api/users/session",
                 HttpMethod.GET,
                 entity,
                 Map.class

@@ -1,6 +1,6 @@
 import openapi from "@elysiajs/openapi";
 import Elysia from "elysia";
-import {auth, OpenAPI} from "./lib/auth"
+import { auth, OpenAPI } from "./lib/auth";
 import { userController } from "./domain/user/controller/user.controller";
 import { addressController } from "./domain/address/controller/address.controller";
 
@@ -27,14 +27,16 @@ const app = new Elysia()
       components: await OpenAPI.components,
       paths: await OpenAPI.getPaths()
     }
-  }
-  ))
+  }))
   .use(betterAuth)
   .use(userController)
   .use(addressController)
   .get("/", () => "Hello Elysia")
   .get("/health", () => ({ status: "ok" }))
-  .listen(6060);
+  .listen({
+    port: 3000,
+    hostname: "0.0.0.0"
+  });
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
