@@ -47,12 +47,97 @@ public class ProductRepositoryJooqImpl implements ProductRepository {
 
     @Override
     public List<Product> findAll() {
-        return List.of();
+        return dsl.selectFrom(PRODUCTS)
+                .orderBy(PRODUCTS.CREATED_AT.desc())
+                .fetch()
+                .map(this::toDomain);
+    }
+
+    /**
+     * Busca paginada de todos os produtos.
+     *
+     * JOOQ Query gerada:
+     * SELECT * FROM products ORDER BY created_at DESC LIMIT {pageSize} OFFSET {offset}
+     *
+     * @param offset Quantos registros pular (page * pageSize)
+     * @param limit Quantos registros retornar
+     */
+    public List<Product> findAllPaginated(int offset, int limit) {
+        return dsl.selectFrom(PRODUCTS)
+                .orderBy(PRODUCTS.CREATED_AT.desc())
+                .limit(limit)
+                .offset(offset)
+                .fetch()
+                .map(this::toDomain);
     }
 
     @Override
     public List<Product> findByName(String name) {
-        return List.of();
+        return dsl.selectFrom(PRODUCTS)
+                .where(PRODUCTS.NAME.eq(name))
+                .fetch()
+                .map(this::toDomain);
+    }
+
+    /**
+     * Busca produtos por nome parcial (LIKE %name%).
+     *
+     * JOOQ Query gerada:
+     * SELECT * FROM products WHERE LOWER(name) LIKE LOWER('%{name}%')
+     *
+     * Case-insensitive search.
+     */
+    public List<Product> findByNameContaining(String name) {
+        return dsl.selectFrom(PRODUCTS)
+                .where(PRODUCTS.NAME.likeIgnoreCase("%" + name + "%"))
+                .orderBy(PRODUCTS.NAME.asc())
+                .fetch()
+                .map(this::toDomain);
+    }
+
+    /**
+     * Busca produtos por categoria.
+     *
+     * JOOQ Query gerada:
+     * SELECT * FROM products WHERE category = {category}
+     */
+    public List<Product> findByCategory(String category) {
+        return dsl.selectFrom(PRODUCTS)
+                .where(PRODUCTS.CATEGORY.eq(category))
+                .orderBy(PRODUCTS.CREATED_AT.desc())
+                .fetch()
+                .map(this::toDomain);
+    }
+
+    /**
+     * Busca produtos por faixa de preço.
+     *
+     * JOOQ Query gerada:
+     * SELECT * FROM products WHERE price BETWEEN {minPrice} AND {maxPrice}
+     *
+     * Ordenado por preço crescente.
+     */
+    public List<Product> findByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+        return dsl.selectFrom(PRODUCTS)
+                .where(PRODUCTS.PRICE.between(minPrice, maxPrice))
+                .orderBy(PRODUCTS.PRICE.asc())
+                .fetch()
+                .map(this::toDomain);
+    }
+
+    /**
+     * Conta total de produtos.
+     *
+     * JOOQ Query gerada:
+     * SELECT COUNT(*) FROM products
+     *
+     * Usado para paginação (calcular total de páginas).
+     */
+    public long count() {
+        Integer count = dsl.selectCount()
+                .from(PRODUCTS)
+                .fetchOne(0, Integer.class);
+        return count != null ? count.longValue() : 0L;
     }
 
     @Override

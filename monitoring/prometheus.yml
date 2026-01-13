@@ -1,0 +1,46 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'catalog-service'
+    static_configs:
+      - targets: ['catalog:8080']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+
+  - job_name: 'search-service'
+    static_configs:
+      - targets: ['search:8081']
+    metrics_path: '/q/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'user-service'
+    static_configs:
+      - targets: ['user-service:8085']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:9092']
+    scrape_interval: 30s
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['mongo:27017']
+    scrape_interval: 30s
