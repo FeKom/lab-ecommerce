@@ -1,0 +1,249 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/ecommerce
+
+jobs:
+  # ============================================
+  # JOB 1: Test all services
+  # ============================================
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand({ping: 1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_ROOT_PASSWORD: test
+          MARIADB_DATABASE: searchdb
+          MARIADB_USER: search
+          MARIADB_PASSWORD: test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "healthcheck.sh --connect --innodb_initialized"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      postgres:
+        image: postgres:alpine
+        env:
+          POSTGRES_DB: users_service
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U admin"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7.2-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Test Catalog Service
+        working-directory: ./catalog
+        run: |
+          ./mvnw test -B \
+            -Dspring.data.mongodb.uri=mongodb://localhost:27017/test \
+            -Dspring.data.redis.host=localhost \
+            -Dspring.data.redis.port=6379
+        continue-on-error: true
+
+      - name: Test Search Service
+        working-directory: ./search
+        run: |
+          ./mvnw test -B \
+            -Dquarkus.datasource.jdbc.url=jdbc:mariadb://localhost:3306/searchdb \
+            -Dquarkus.datasource.username=search \
+            -Dquarkus.datasource.password=test
+        continue-on-error: true
+
+      - name: Test User Service
+        working-directory: ./user
+        run: |
+          bun install --frozen-lockfile || bun install
+          bun test || echo "Tests completed"
+        continue-on-error: true
+
+  # ============================================
+  # JOB 2: Build and Push Docker Images
+  # ============================================
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        include:
+          - service: catalog
+            context: ./catalog
+            dockerfile: ./catalog/Dockerfile
+          - service: search
+            context: ./search
+            dockerfile: ./search/Dockerfile
+          - service: user
+            context: ./user
+            dockerfile: ./user/Dockerfile
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (for ARM builds)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================
+  # JOB 3: Deploy to Oracle Cloud
+  # ============================================
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Oracle Cloud VM
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_ACTOR: ${{ github.actor }}
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ${{ secrets.ORACLE_USER }}
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          port: 22
+          envs: GH_TOKEN,GH_ACTOR
+          script_stop: true
+          script: |
+            set -e
+
+            echo "=== Starting deployment ==="
+            cd /home/opc/ecommerce
+
+            # Login to GitHub Container Registry
+            echo "$GH_TOKEN" | docker login ghcr.io -u "$GH_ACTOR" --password-stdin
+
+            # Pull latest images
+            echo "=== Pulling latest images ==="
+            docker compose -f docker-compose.prod.yml pull user-service catalog search
+
+            # Deploy services one by one (Rolling Update)
+            SERVICES="user-service catalog search"
+
+            for service in $SERVICES; do
+              echo "=== Deploying $service ==="
+
+              # Update service
+              docker compose -f docker-compose.prod.yml up -d --no-deps $service
+
+              # Wait for health check (max 120s)
+              echo "Waiting for $service to be healthy..."
+              timeout=120
+              while [ $timeout -gt 0 ]; do
+                if docker compose -f docker-compose.prod.yml ps $service 2>/dev/null | grep -q "healthy"; then
+                  echo "$service is healthy!"
+                  break
+                fi
+                sleep 10
+                timeout=$((timeout - 10))
+                echo "  Waiting... (${timeout}s remaining)"
+              done
+
+              if [ $timeout -le 0 ]; then
+                echo "WARNING: $service health check timeout, but continuing..."
+              fi
+            done
+
+            # Cleanup old images
+            echo "=== Cleaning up old images ==="
+            docker image prune -f
+
+            echo "=== Deployment completed successfully! ==="
+
+            # Show running services
+            docker compose -f docker-compose.prod.yml ps

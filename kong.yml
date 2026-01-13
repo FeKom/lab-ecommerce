@@ -1,0 +1,134 @@
+_format_version: "3.0"
+
+services:
+  - name: catalog-service
+    url: http://catalog:8080
+    routes:
+      - name: catalog-route
+        paths:
+          - /api/catalog
+        strip_path: true
+
+  - name: search-service
+    url: http://search:8081
+    routes:
+      - name: search-route
+        paths:
+          - /api/search
+        strip_path: true
+
+  - name: user-service
+    url: http://user-service:8085
+    routes:
+      - name: user-route
+        paths:
+          - /api/user
+        strip_path: true
+
+plugins:
+  - name: cors
+    service: catalog-service
+    config:
+      origins:
+        - http://localhost:4200
+        - http://localhost:80
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      headers:
+        - Accept
+        - Accept-Version
+        - Content-Length
+        - Content-MD5
+        - Content-Type
+        - Date
+        - X-Auth-Token
+      credentials: true
+
+  - name: cors
+    service: search-service
+    config:
+      origins:
+        - http://localhost:4200
+        - http://localhost:80
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      headers:
+        - Accept
+        - Accept-Version
+        - Content-Length
+        - Content-MD5
+        - Content-Type
+        - Date
+        - X-Auth-Token
+      credentials: true
+
+  - name: cors
+    service: user-service
+    config:
+      origins:
+        - http://localhost:4200
+        - http://localhost:80
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      headers:
+        - Accept
+        - Accept-Version
+        - Content-Length
+        - Content-MD5
+        - Content-Type
+        - Date
+        - X-Auth-Token
+        - Authorization
+      credentials: true
+
+  - name: rate-limiting
+    service: catalog-service
+    config:
+      minute: 100
+      hour: 1000
+
+  - name: rate-limiting
+    service: search-service
+    config:
+      minute: 200
+      hour: 2000
+
+  - name: rate-limiting
+    service: user-service
+    config:
+      minute: 50
+      hour: 500
+
+  - name: request-transformer
+    service: catalog-service
+    config:
+      add:
+        headers:
+          - "X-API-Gateway: kong"
+          - "X-Service-Name: catalog"
+
+  - name: request-transformer
+    service: search-service
+    config:
+      add:
+        headers:
+          - "X-API-Gateway: kong"
+          - "X-Service-Name: search"
+
+  - name: request-transformer
+    service: user-service
+    config:
+      add:
+        headers:
+          - "X-API-Gateway: kong"
+          - "X-Service-Name: user"

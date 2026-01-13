@@ -1,14 +1,20 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/catalog
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/catalog}
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6380}
   server:
     port: 8080
   application:
     name: catalog
-  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000 # 10 minutes in milliseconds
+      cache-null-values: false
 
-  
   kafka:
     topic: catalog-products
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
@@ -18,13 +24,53 @@ spring:
       properties:
         spring.json.add.type.headers: false
 
+# Custom application properties
+app:
+  user-service:
+    url: ${USER_SERVICE_URL:http://localhost:8085}
+
 
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,circuitbreakers,circuitbreakerevents
+  health:
+    circuitbreakers:
+      enabled: true
+
+# Resilience4j Circuit Breaker Configuration
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: 2s
+    instances:
+      userService:
+        baseConfig: default
+        slidingWindowSize: 20
+        minimumNumberOfCalls: 5
+  retry:
+    configs:
+      default:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - java.net.ConnectException
+    instances:
+      userService:
+        baseConfig: default
+  timelimiter:
+    instances:
+      userService:
+        timeoutDuration: 3s
 
 logging:
   level:

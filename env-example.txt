@@ -1,0 +1,106 @@
+# =============================================================================
+# E-commerce Microservices - Environment Configuration
+# =============================================================================
+# COPY this file to .env and configure the values
+# For production on Oracle Cloud, update all passwords with secure values
+# =============================================================================
+
+# === GITHUB (for CI/CD) ===
+GITHUB_USER=your-github-username
+
+# === BANCO DE DADOS ===
+
+# MongoDB (Catalog Service)
+MONGO_USER=admin
+MONGO_PASSWORD=SecureMongoPass_ChangeMe!
+
+# PostgreSQL (User Service)
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=SecurePostgresPass_ChangeMe!
+
+# MariaDB (Search Service)
+MARIADB_ROOT_PASSWORD=SecureMariaDBRoot_ChangeMe!
+MARIADB_USER=search
+MARIADB_PASSWORD=SecureMariaDBPass_ChangeMe!
+
+# === KAFKA ===
+KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
+# === REDIS ===
+REDIS_URL=redis://redis:6379
+
+# === SERVIÇOS EXTERNOS ===
+
+# Jaeger (Tracing)
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://jaeger:4318/v1/traces
+
+# Elasticsearch (Logs)
+ELASTICSEARCH_URL=http://elasticsearch:9200
+
+# === CONFIGURAÇÕES DE AMBIENTE ===
+
+# Ambiente (development, staging, production)
+NODE_ENV=production
+SPRING_PROFILES_ACTIVE=prod
+QUARKUS_PROFILE=prod
+
+# Logging
+LOG_LEVEL=info
+LOG_FORMAT=json
+
+# === MONITORAMENTO ===
+
+# Prometheus
+PROMETHEUS_URL=http://prometheus:9090
+
+# Grafana
+GRAFANA_URL=http://grafana:3000
+GRAFANA_PASSWORD=SecureGrafanaPass_ChangeMe!
+
+# === SEGURANÇA ===
+
+# JWT Secrets (MUST be changed in production - use: openssl rand -base64 64)
+JWT_SECRET=your_jwt_secret_here_change_in_production_use_openssl_rand
+JWT_EXPIRES_IN=7d
+
+# === RATE LIMITING ===
+RATE_LIMIT_REQUESTS_PER_MINUTE=100
+RATE_LIMIT_BURST=200
+
+# === CACHE ===
+CACHE_TTL_SECONDS=3600
+CACHE_MAX_SIZE=10000
+
+# === HEALTH CHECKS ===
+HEALTH_CHECK_TIMEOUT=3000
+HEALTH_CHECK_INTERVAL=30000
+
+# =============================================================================
+# ORACLE CLOUD SETUP (for GitHub Secrets)
+# =============================================================================
+# Add these as GitHub Secrets in your repository:
+#
+# ORACLE_HOST      = <Public IP of your Oracle Cloud VM>
+# ORACLE_USER      = opc
+# ORACLE_SSH_KEY   = <Your private SSH key content>
+#
+# The GITHUB_TOKEN is automatically provided by GitHub Actions
+# =============================================================================
+
+# =============================================================================
+# QUICK START FOR ORACLE CLOUD
+# =============================================================================
+# 1. Create Oracle Cloud Free Tier account
+# 2. Create VM: Shape VM.Standard.A1.Flex, 4 OCPUs, 24GB RAM
+# 3. SSH into VM: ssh -i ~/oracle_key opc@<IP>
+# 4. Install Docker:
+#    sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+#    sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+#    sudo systemctl enable --now docker
+#    sudo usermod -aG docker opc
+# 5. Clone repo: git clone https://github.com/<user>/lab-ecommerce.git ~/ecommerce
+# 6. Copy this file: cp env-example.txt .env
+# 7. Edit .env with secure passwords
+# 8. Start: docker compose -f docker-compose.prod.yml up -d
+# 9. Configure GitHub Secrets for automated deployments
+# =============================================================================

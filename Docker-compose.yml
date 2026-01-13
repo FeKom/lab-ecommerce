@@ -40,11 +40,20 @@ services:
     container_name: mongo
     ports:
       - "27017:27017"
-    command: mongod --noauth
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-SecureMongoPass123!}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-catalog}
     volumes:
       - mongo_data:/data/db
     networks:
       - ecommerce-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
 
   redis:
     image: redis:7.2-alpine
@@ -55,27 +64,40 @@ services:
       - redis_data:/data
     networks:
       - ecommerce-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   mariadb:
     image: mariadb:11
     container_name: mariadb-search
     environment:
-      MARIADB_ROOT_PASSWORD: root
-      MARIADB_DATABASE: searchdb
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-SecureMariaDBPass123!}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-searchdb}
+      MARIADB_USER: ${MARIADB_USER:-search_user}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-SearchUserPass123!}
     ports:
       - "3307:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
       - ecommerce-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   postgres:
     image: postgres:alpine
     container_name: postgres-user
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: users_service
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-SecurePostgresPass123!}
+      POSTGRES_DB: ${POSTGRES_DB:-users_service}
     ports:
       - "5434:5432"
     restart: on-failure:4
@@ -83,16 +105,25 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d users_service"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
-  catalog:
+  catalog-service:
     build:
       context: .
       dockerfile: catalog/Dockerfile
     container_name: catalog-service
     depends_on:
-      - kafka
-      - redis
-      - mongo
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     ports:
       - "8080:8080"
     environment:
@@ -100,29 +131,79 @@ services:
       LOGGING_LEVEL_ROOT: INFO
       LOGGING_LEVEL_APP: DEBUG
       LOGGING_LEVEL_MONGODB_DRIVER: WARN
+      SPRING_DATA_MONGODB_URI: mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-SecureMongoPass123!}@mongo:27017/${MONGO_DATABASE:-catalog}?authSource=admin
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      USER_SERVICE_URL: http://user-service:8085
     networks:
       - ecommerce-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  search-service:
+    build:
+      context: .
+      dockerfile: /search/src/main/docker/Dockerfile.native-micro
+      container_name: search-service
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    ports:
+      - "8081:8081"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      QUARKUS_DATASOURCE_DB_KIND: mariadb
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:mariadb://mariadb-search:3306/${MARIADB_DATABASE:-searchdb}
+      QUARKUS_DATASOURCE_USERNAME: ${MARIADB_USER:-search_user}
+      QUARKUS_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD:-SearchUserPass123!}
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_LEVEL_APP: DEBUG
+      USER_SERVICE_URL: http://user-service:8085
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/q/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
 
   user-service:
     build:
-      context: user/
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: user/Dockerfile
     container_name: user-service
     env_file:
       - user/.env.docker
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
       - "8085:8085"
     environment:
       POSTGRES_HOST: postgres
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: users_service
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-SecurePostgresPass123!}
+      POSTGRES_DB: ${POSTGRES_DB:-users_service}
+      POSTGRES_PORT: 5432
     networks:
       - ecommerce-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
   # frontend:
   #   build: ./frontend
   #   container_name: ecommerce-frontend
@@ -143,6 +224,87 @@ services:
   #     - catalog
   #     - search
 
+
+  # === OBSERVABILIDADE ===
+
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  logstash:
+    image: logstash:8.11.0
+    container_name: logstash
+    volumes:
+      - ./monitoring/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - "5044:5044"
+    depends_on:
+      - elasticsearch
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  kibana:
+    image: kibana:8.11.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
 networks:
   ecommerce-network:
     driver: bridge
@@ -158,3 +320,6 @@ volumes:
   zookeeper_data:
   zookeeper_logs:
   kafka_data:
+  elasticsearch_data:
+  prometheus_data:
+  grafana_data:

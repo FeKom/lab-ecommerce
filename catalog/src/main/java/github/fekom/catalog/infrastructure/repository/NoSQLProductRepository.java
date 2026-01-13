@@ -2,6 +2,9 @@ package github.fekom.catalog.infrastructure.repository;
 
 import github.fekom.catalog.domain.entities.Product;
 import github.fekom.catalog.domain.entities.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -80,5 +83,47 @@ public class NoSQLProductRepository implements ProductRepository {
 
         return Optional.ofNullable(persistenceProduct)
                 .map(github.fekom.catalog.infrastructure.persistence.Product::toDomain);
+    }
+
+    /**
+     * Implementação de paginação com MongoDB.
+     *
+     * COMO FUNCIONA:
+     * 1. Cria uma Query vazia (busca todos)
+     * 2. Aplica paginação com .with(pageable) - define offset e limit
+     * 3. Conta total de documentos para calcular número de páginas
+     * 4. Retorna Page<Product> com dados + metadados
+     *
+     * PERFORMANCE:
+     * - .with(pageable): MongoDB usa skip() e limit() - eficiente para primeiras páginas
+     * - .count(): Query separada - pode ser lenta com muitos documentos (considere cache)
+     * - Para melhor performance em produção, adicione índice no campo de ordenação
+     *
+     * EXEMPLO DE USO:
+     * Pageable pageable = PageRequest.of(0, 20, Sort.by("createdAt").descending());
+     * Page<Product> products = repository.findAll(pageable);
+     * // Retorna produtos 0-19, ordenados por data de criação (mais recentes primeiro)
+     */
+    @Override
+    public Page<Product> findAll(Pageable pageable) {
+        var persistence = github.fekom.catalog.infrastructure.persistence.Product.class;
+
+        // Query básica (sem filtros) com paginação
+        Query query = new Query().with(pageable);
+
+        // Busca documentos da página solicitada
+        List<github.fekom.catalog.infrastructure.persistence.Product> persistenceProducts =
+                mongoTemplate.find(query, persistence);
+
+        // Converte persistence -> domain
+        List<Product> domainProducts = persistenceProducts.stream()
+                .map(github.fekom.catalog.infrastructure.persistence.Product::toDomain)
+                .toList();
+
+        // Conta total de documentos (para calcular total de páginas)
+        long total = mongoTemplate.count(new Query(), persistence);
+
+        // Retorna Page com dados + metadados (totalElements, totalPages, etc)
+        return new PageImpl<>(domainProducts, pageable, total);
     }
 }
