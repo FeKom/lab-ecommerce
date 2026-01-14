@@ -7,12 +7,15 @@ import org.springframework.kafka.core.KafkaTemplate;
 @Configuration
 public class ProductEventPublisher {
     private final KafkaTemplate<String, Product> kafkaTemplate;
+    private final KafkaTemplate<String, String> stringKafkaTemplate;
     private static final String CREATE_TOPIC = "product-created";
     private static final String UPDATE_TOPIC = "product-updated";
     private static final String DELETE_TOPIC = "product-deleted";
 
-    public ProductEventPublisher(KafkaTemplate<String, Product> kafkaTemplate) {
+    public ProductEventPublisher(KafkaTemplate<String, Product> kafkaTemplate,
+                                  KafkaTemplate<String, String> stringKafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
+        this.stringKafkaTemplate = stringKafkaTemplate;
     }
 
 
@@ -34,6 +37,6 @@ public class ProductEventPublisher {
     }
 
     public void publishProductDeletedEvent(String productId) {
-        kafkaTemplate.send(DELETE_TOPIC, productId, null);
+        stringKafkaTemplate.send(DELETE_TOPIC, productId, productId);
     }
 }

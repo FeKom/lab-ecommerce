@@ -19,7 +19,6 @@
   },
   "devDependencies": {
     "@types/pg": "^8.16.0",
-    "better-sqlite3": "^12.5.0",
     "bun-types": "latest",
     "tsx": "^4.21.0"
   },

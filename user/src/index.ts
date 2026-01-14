@@ -34,7 +34,7 @@ const app = new Elysia()
   .get("/", () => "Hello Elysia")
   .get("/health", () => ({ status: "ok" }))
   .listen({
-    port: 3000,
+    port: process.env.PORT ? parseInt(process.env.PORT) : 8085,
     hostname: "0.0.0.0"
   });
 

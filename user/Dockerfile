@@ -2,8 +2,7 @@ FROM oven/bun AS build
 WORKDIR /app
 
 COPY package.json package.json
-COPY bun.lock bun.lock
-RUN bun install
+RUN bun install --ignore-scripts
 COPY tsconfig.json tsconfig.json
 COPY ./src ./src
 COPY ./build.ts ./build.ts

@@ -13,3 +13,10 @@ bun run dev
 ```
 
 Open http://localhost:3000/ with your browser to see the result.
+
+
+bunx @better-auth/cli generate
+
+bunx @better-auth/cli migrate
+
+bun run src/infra/database/setup/runner-up.ts

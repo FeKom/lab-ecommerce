@@ -6,11 +6,11 @@ RUN apk add --no-cache maven
 WORKDIR /build
 
 # Copiar pom.xml e baixar dependências (cache layer)
-COPY catalog/pom.xml .
+COPY pom.xml .
 RUN mvn dependency:go-offline -B || true
 
 # Copiar código fonte e buildar
-COPY catalog/src ./src
+COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Verificar se o JAR foi criado

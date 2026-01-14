@@ -1,5 +1,8 @@
 package github.fekom.catalog.infrastructure.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -70,9 +73,10 @@ public class CacheConfig {
             )
 
             // Serialização do valor: Product convertido para JSON
+            // Configura ObjectMapper com suporte a Java 8 date/time types
             .serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(
-                    new GenericJackson2JsonRedisSerializer()
+                    new GenericJackson2JsonRedisSerializer(createObjectMapper())
                 )
             );
 
@@ -81,5 +85,19 @@ public class CacheConfig {
             .cacheDefaults(config)
             .transactionAware() // Integra com @Transactional
             .build();
+    }
+
+    /**
+     * Cria ObjectMapper configurado para suportar tipos Java 8 date/time.
+     */
+    private ObjectMapper createObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.activateDefaultTyping(
+            mapper.getPolymorphicTypeValidator(),
+            ObjectMapper.DefaultTyping.NON_FINAL
+        );
+        return mapper;
     }
 }

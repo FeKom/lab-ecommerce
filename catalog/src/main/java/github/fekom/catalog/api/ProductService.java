@@ -119,7 +119,7 @@ public class ProductService {
      * - COM cache: <1ms (leitura Redis em memória)
      * - Redução: 98% no tempo de resposta!
      */
-    @Cacheable(value = "products", key = "#id", unless = "#result == null || !#result.isPresent()")
+    @Cacheable(value = "products", key = "#id", unless = "#result == null")
     public Optional<Product> findProductById(String id) {
         // Spring automaticamente:
         // 1. Verifica se existe no Redis

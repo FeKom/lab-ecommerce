@@ -2,6 +2,391 @@
 
 Uma plataforma de e-commerce distribuída composta por 4 serviços principais: **User Service** (autenticação/autorização), **Catalog Service** (gerenciamento de produtos), **Search Service** (buscas performáticas) e **Frontend** (interface Angular).
 
+## 🚀 Quick Start
+
+### Pré-requisitos
+
+- Docker e Docker Compose
+- 8GB+ RAM disponível para os containers
+
+### Subir todos os serviços
+
+```bash
+docker-compose up -d
+```
+
+### Verificar status dos serviços
+
+```bash
+docker-compose ps
+```
+
+### Portas dos serviços
+
+| Serviço | Porta | Descrição |
+|---------|-------|-----------|
+| User Service | 8085 | Autenticação (Better-Auth) |
+| Catalog Service | 8080 | CRUD de Produtos |
+| Search Service | 8081 | Busca de Produtos |
+| Kafka | 9092 | Message Broker |
+| PostgreSQL | 5434 | DB do User Service |
+| MongoDB | 27017 | DB do Catalog Service |
+| MariaDB | 3307 | DB do Search Service |
+| Redis | 6379 | Cache |
+| Grafana | 3000 | Dashboards |
+| Prometheus | 9090 | Métricas |
+| Kibana | 5601 | Logs |
+| Jaeger | 16686 | Tracing |
+
+---
+
+## 🧪 Como Testar a Aplicação
+
+### 1. Criar um usuário
+
+```bash
+curl -X POST "http://localhost:8085/api/auth/sign-up/email" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "SecurePassword123!",
+    "phone": "11999999999"
+  }'
+```
+
+**Resposta esperada:**
+```json
+{
+  "user": {
+    "id": "019bbd7d-340a-71d5-aa5e-5797a17fe30a",
+    "name": "Test User",
+    "email": "test@example.com",
+    "emailVerified": false
+  }
+}
+```
+
+### 2. Verificar email do usuário
+
+```bash
+curl -X POST "http://localhost:8085/api/users/verify-email/{userId}"
+```
+
+Substitua `{userId}` pelo ID retornado na criação.
+
+### 3. Fazer login
+
+```bash
+curl -X POST "http://localhost:8085/api/auth/sign-in/email" \
+  -H "Content-Type: application/json" \
+  -c cookies.txt \
+  -d '{
+    "email": "test@example.com",
+    "password": "SecurePassword123!"
+  }'
+```
+
+O cookie de sessão será salvo em `cookies.txt`.
+
+### 4. Criar um produto (autenticado)
+
+```bash
+curl -X POST "http://localhost:8080/api/products" \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "name": "Notebook Dell Inspiron",
+    "price": 3500.00,
+    "stock": 10,
+    "tags": ["notebook", "dell", "laptop"],
+    "category": "Electronics",
+    "description": "Notebook Dell Inspiron 15 polegadas, 16GB RAM, SSD 512GB"
+  }'
+```
+
+**Resposta esperada:**
+```json
+{
+  "id": "019bbd82-524d-795d-b35e-d8d6f286270e",
+  "name": "Notebook Dell Inspiron",
+  "price": 3500.00,
+  "stock": 10,
+  "tags": ["notebook", "dell", "laptop"],
+  "category": "Electronics",
+  "description": "Notebook Dell Inspiron 15 polegadas, 16GB RAM, SSD 512GB",
+  "userId": "019bbd7d-340a-71d5-aa5e-5797a17fe30a",
+  "createdAt": "2026-01-14T17:16:33.123456",
+  "updatedAt": "2026-01-14T17:16:33.123456"
+}
+```
+
+### 5. Buscar produtos (Search Service)
+
+O produto é sincronizado automaticamente via Kafka para o Search Service.
+
+```bash
+# Buscar por nome
+curl "http://localhost:8081/api/search/products?q=Notebook"
+
+# Buscar todos os produtos
+curl "http://localhost:8081/api/search/products"
+```
+
+**Resposta esperada:**
+```json
+{
+  "total": 1,
+  "size": 20,
+  "totalPages": 1,
+  "page": 0,
+  "products": [
+    {
+      "id": "019bbd82-524d-795d-b35e-d8d6f286270e",
+      "name": "Notebook Dell Inspiron",
+      "price": 3500.00,
+      "stock": 10,
+      "category": "Electronics",
+      "description": "Notebook Dell Inspiron 15 polegadas, 16GB RAM, SSD 512GB"
+    }
+  ]
+}
+```
+
+### 6. Listar produtos com paginação (Catalog Service)
+
+```bash
+# Primeira página, 10 itens, ordenado por preço
+curl "http://localhost:8080/api/products?page=0&size=10&sortBy=price&sortDir=asc"
+```
+
+### 7. Atualizar um produto
+
+```bash
+curl -X PUT "http://localhost:8080/api/products/{productId}" \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "name": "Notebook Dell Inspiron 15",
+    "price": 3299.90,
+    "stock": 15
+  }'
+```
+
+### 8. Deletar um produto
+
+```bash
+curl -X DELETE "http://localhost:8080/api/products/{productId}" \
+  -b cookies.txt
+```
+
+**Resposta esperada:** `204 No Content`
+
+---
+
+## 🔐 Testando Permissões (RBAC)
+
+### Cenário: Usuário A tenta deletar produto do Usuário B
+
+1. Crie dois usuários (User A e User B)
+2. Faça login com User A e crie um produto
+3. Faça login com User B e tente deletar o produto do User A
+
+```bash
+# Login como User B
+curl -X POST "http://localhost:8085/api/auth/sign-in/email" \
+  -H "Content-Type: application/json" \
+  -c cookies-userB.txt \
+  -d '{"email": "userB@example.com", "password": "Password123!"}'
+
+# Tentar deletar produto do User A (deve falhar)
+curl -X DELETE "http://localhost:8080/api/products/{productIdDoUserA}" \
+  -b cookies-userB.txt
+```
+
+**Resposta esperada:**
+```json
+{
+  "error": "Access denied",
+  "message": "You can only delete your own products"
+}
+```
+**HTTP Status:** `403 Forbidden`
+
+---
+
+## 📡 Endpoints da API
+
+### User Service (porta 8085)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/api/auth/sign-up/email` | Criar conta |
+| POST | `/api/auth/sign-in/email` | Login |
+| POST | `/api/auth/sign-out` | Logout |
+| GET | `/api/users/session` | Validar sessão |
+| POST | `/api/users/verify-email/{id}` | Verificar email |
+
+### Catalog Service (porta 8080)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/products` | Listar produtos (paginado) |
+| GET | `/api/products/{id}` | Buscar produto por ID |
+| POST | `/api/products` | Criar produto (auth required) |
+| PUT | `/api/products/{id}` | Atualizar produto (owner only) |
+| DELETE | `/api/products/{id}` | Deletar produto (owner only) |
+
+**Query params para listagem:**
+- `page` - Número da página (default: 0)
+- `size` - Itens por página (default: 20, max: 100)
+- `sortBy` - Campo para ordenação (default: createdAt)
+- `sortDir` - Direção: asc ou desc (default: desc)
+
+### Search Service (porta 8081)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/search/products` | Buscar produtos |
+| GET | `/api/search/products?q={term}` | Buscar por termo |
+
+---
+
+## 🔄 Sincronização via Kafka
+
+Os serviços se comunicam através de eventos Kafka:
+
+```
+┌──────────────────┐         ┌───────────────┐         ┌──────────────────┐
+│  Catalog Service │ ──────► │     Kafka     │ ──────► │  Search Service  │
+│                  │         │               │         │                  │
+│  • product-created        │  Topics:      │         │  • Indexa produto│
+│  • product-updated        │  - product-created      │  • Atualiza índice│
+│  • product-deleted        │  - product-updated      │  • Remove índice │
+│                  │         │  - product-deleted      │                  │
+└──────────────────┘         └───────────────┘         └──────────────────┘
+```
+
+### Verificar eventos no Kafka
+
+```bash
+# Listar topics
+docker exec kafka kafka-topics --list --bootstrap-server localhost:9092
+
+# Consumir eventos de criação
+docker exec kafka kafka-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic product-created \
+  --from-beginning
+```
+
+---
+
+## 🗄️ Acessar Bancos de Dados
+
+### PostgreSQL (User Service)
+
+```bash
+docker exec -it postgres-user psql -U admin -d users_service
+
+# Listar usuários
+SELECT id, name, email, email_verified FROM "user";
+
+# Listar sessões ativas
+SELECT * FROM session WHERE expires_at > NOW();
+```
+
+### MongoDB (Catalog Service)
+
+```bash
+docker exec -it mongo mongosh
+
+use catalog
+db.product.find().pretty()
+```
+
+### MariaDB (Search Service)
+
+```bash
+docker exec -it mariadb-search mysql -u root -proot search_db
+
+SELECT * FROM products;
+```
+
+---
+
+## 📊 Monitoramento
+
+### Grafana
+- URL: http://localhost:3000
+- Login: admin / admin
+
+### Prometheus
+- URL: http://localhost:9090
+- Métricas dos serviços Java disponíveis
+
+### Kibana (Logs)
+- URL: http://localhost:5601
+
+### Jaeger (Tracing)
+- URL: http://localhost:16686
+
+---
+
+## 🐛 Troubleshooting
+
+### Serviço não inicia
+
+```bash
+# Ver logs do serviço
+docker logs catalog-service
+docker logs search-service
+docker logs user-service
+
+# Reiniciar serviço específico
+docker-compose restart catalog-service
+```
+
+### Erro de conexão com banco
+
+```bash
+# Verificar se os bancos estão rodando
+docker-compose ps | grep -E "postgres|mongo|mariadb"
+
+# Verificar conectividade
+docker exec catalog-service ping mongo
+```
+
+### Produto não aparece na busca
+
+1. Verificar se o Kafka está rodando:
+```bash
+docker logs kafka | tail -20
+```
+
+2. Verificar se o Search Service está consumindo:
+```bash
+docker logs search-service | grep -E "product-created|Received"
+```
+
+3. Limpar cache do Redis:
+```bash
+docker exec redis redis-cli FLUSHALL
+```
+
+### Erro 401 Unauthorized
+
+- Verifique se o cookie de sessão está sendo enviado
+- Verifique se o email foi verificado
+- Tente fazer login novamente
+
+### Erro 403 Forbidden
+
+- Você está tentando modificar/deletar um recurso de outro usuário
+- Apenas o dono do produto pode alterá-lo ou deletá-lo
+
+---
+
 ## 📋 Visão Geral da Arquitetura
 
 ```
@@ -318,26 +703,7 @@ public record CreateProductRequest(
 - **NACLs**: Network Access Control Lists
 - **API Gateway**: Rate limiting, CORS, autenticação
 
-#### **Secrets Management**
-```yaml
-# Kubernetes - External Secrets Operator
-apiVersion: external-secrets.io/v1beta1
-kind: ExternalSecret
-metadata:
-  name: database-credentials
-spec:
-  secretStoreRef:
-    name: aws-secretsmanager
-    kind: SecretStore
-  target:
-    name: db-secret
-    creationPolicy: Owner
-  data:
-  - secretKey: password
-    remoteRef:
-      key: prod/database
-      property: password
-```
+
 
 #### **OWASP Top 10 Mitigations**
 1. **Injection**: Prepared statements, ORM
@@ -580,43 +946,6 @@ public class AuthUtils {
 }
 ```
 
-#### **Service Discovery**
-```yaml
-# Kubernetes - Service Discovery
-apiVersion: v1
-kind: Service
-metadata:
-  name: user-service
-  labels:
-    app: user-service
-spec:
-  selector:
-    app: user-service
-  ports:
-  - port: 3000
-    targetPort: 3000
-  type: ClusterIP
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-catalog-to-user
-spec:
-  podSelector:
-    matchLabels:
-      app: catalog
-  policyTypes:
-  - Ingress
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: catalog
-    ports:
-    - protocol: TCP
-        port: 3000
-```
-
 ### **Load Testing e Benchmarks**
 
 #### **Ferramentas Recomendadas**
@@ -700,7 +1029,6 @@ public class DatabaseHealthIndicator implements HealthIndicator {
 ### **Roadmap Priorizado**
 
 #### **Fase 1: DevOps Fundamentals (2-3 semanas)**
-- [ ] Kubernetes manifests para todos os serviços
 - [ ] CI/CD pipeline completo
 - [ ] Docker multi-stage otimizado
 - [ ] ConfigMaps e Secrets
@@ -713,7 +1041,6 @@ public class DatabaseHealthIndicator implements HealthIndicator {
 
 #### **Fase 3: Performance (2-3 semanas)**
 - [ ] Database indexing e otimização
-- [ ] Redis caching strategy
 - [ ] Message queue tuning
 - [ ] Load testing suite
 

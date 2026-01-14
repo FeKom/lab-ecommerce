@@ -85,6 +85,15 @@
             <artifactId>quarkus-agroal</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-flyway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+            <version>10.20.1</version>
+        </dependency>
+        <dependency>
             <groupId>io.quarkiverse.jooq</groupId>
             <artifactId>quarkus-jooq</artifactId>
             <version>2.1.0</version>
@@ -154,7 +163,7 @@
                 <executions>
                     <execution>
                         <id>generate-jooq</id>
-                        <phase>generate-sources</phase>
+                        <phase>none</phase> <!-- Skip by default, run manually: mvn jooq-codegen:generate -->
                         <goals>
                             <goal>generate</goal>
                         </goals>

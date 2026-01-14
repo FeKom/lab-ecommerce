@@ -71,7 +71,7 @@ services:
       retries: 3
 
   mariadb:
-    image: mariadb:11
+    image: mariadb:10.11
     container_name: mariadb-search
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-SecureMariaDBPass123!}
@@ -114,8 +114,8 @@ services:
 
   catalog-service:
     build:
-      context: .
-      dockerfile: catalog/Dockerfile
+      context: ./catalog
+      dockerfile: Dockerfile
     container_name: catalog-service
     depends_on:
       mongo:
@@ -147,9 +147,9 @@ services:
 
   search-service:
     build:
-      context: .
-      dockerfile: /search/src/main/docker/Dockerfile.native-micro
-      container_name: search-service
+      context: ./search
+      dockerfile: Dockerfile
+    container_name: search-service
     depends_on:
       mariadb:
         condition: service_healthy
@@ -159,6 +159,7 @@ services:
       - "8081:8081"
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MP_MESSAGING_CONNECTOR_SMALLRYE_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       QUARKUS_DATASOURCE_DB_KIND: mariadb
       QUARKUS_DATASOURCE_JDBC_URL: jdbc:mariadb://mariadb-search:3306/${MARIADB_DATABASE:-searchdb}
       QUARKUS_DATASOURCE_USERNAME: ${MARIADB_USER:-search_user}
@@ -179,8 +180,8 @@ services:
 
   user-service:
     build:
-      context: .
-      dockerfile: user/Dockerfile
+      context: ./user
+      dockerfile: Dockerfile
     container_name: user-service
     env_file:
       - user/.env.docker

@@ -1,0 +1,8 @@
+{
+  "name": "Notebook Dell Inspiron",
+  "description": "Notebook Dell Inspiron 15 polegadas, 16GB RAM, SSD 512GB",
+  "price": 3500.00,
+  "stock": 10,
+  "category": "Electronics",
+  "tags": ["notebook", "dell", "laptop"]
+}

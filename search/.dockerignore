@@ -1,4 +1,14 @@
+# Ignore everything by default
 *
+
+# But include source files for multi-stage build
+!src/
+!pom.xml
+!mvnw
+!mvnw.cmd
+!.mvn/
+
+# And keep the target artifacts for single-stage builds
 !target/*-runner
 !target/*-runner.jar
 !target/lib/*
