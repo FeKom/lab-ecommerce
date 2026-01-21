@@ -72,8 +72,8 @@ jobs:
       - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: "temurin"
           cache: maven
 
       - name: Setup Bun
@@ -172,78 +172,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # ============================================
-  # JOB 3: Deploy to Oracle Cloud
-  # ============================================
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    environment: production
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Oracle Cloud VM
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_ACTOR: ${{ github.actor }}
-        with:
-          host: ${{ secrets.ORACLE_HOST }}
-          username: ${{ secrets.ORACLE_USER }}
-          key: ${{ secrets.ORACLE_SSH_KEY }}
-          port: 22
-          envs: GH_TOKEN,GH_ACTOR
-          script_stop: true
-          script: |
-            set -e
-
-            echo "=== Starting deployment ==="
-            cd /home/opc/ecommerce
-
-            # Login to GitHub Container Registry
-            echo "$GH_TOKEN" | docker login ghcr.io -u "$GH_ACTOR" --password-stdin
-
-            # Pull latest images
-            echo "=== Pulling latest images ==="
-            docker compose -f docker-compose.prod.yml pull user-service catalog search
-
-            # Deploy services one by one (Rolling Update)
-            SERVICES="user-service catalog search"
-
-            for service in $SERVICES; do
-              echo "=== Deploying $service ==="
-
-              # Update service
-              docker compose -f docker-compose.prod.yml up -d --no-deps $service
-
-              # Wait for health check (max 120s)
-              echo "Waiting for $service to be healthy..."
-              timeout=120
-              while [ $timeout -gt 0 ]; do
-                if docker compose -f docker-compose.prod.yml ps $service 2>/dev/null | grep -q "healthy"; then
-                  echo "$service is healthy!"
-                  break
-                fi
-                sleep 10
-                timeout=$((timeout - 10))
-                echo "  Waiting... (${timeout}s remaining)"
-              done
-
-              if [ $timeout -le 0 ]; then
-                echo "WARNING: $service health check timeout, but continuing..."
-              fi
-            done
-
-            # Cleanup old images
-            echo "=== Cleaning up old images ==="
-            docker image prune -f
-
-            echo "=== Deployment completed successfully! ==="
-
-            # Show running services
-            docker compose -f docker-compose.prod.yml ps
+          cache-to: type=gha,mode=max,push=true
