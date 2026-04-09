@@ -8,10 +8,12 @@
   },
   "dependencies": {
     "@better-auth/cli": "^1.4.6",
+    "@elysiajs/cors": "^1.4.1",
     "@elysiajs/openapi": "^1.4.11",
     "better-auth": "^1.4.6",
     "elysia": "^1.4.17",
     "kysely": "^0.28.8",
+    "logixlysia": "^6.2.0",
     "pg": "^8.16.3",
     "postgres": "^3.4.7",
     "uuidv7": "^1.1.0",

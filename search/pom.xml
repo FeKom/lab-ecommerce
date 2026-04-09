@@ -1,5 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
     <modelVersion>4.0.0</modelVersion>
     <groupId>github.fekom</groupId>
     <artifactId>search</artifactId>
@@ -9,13 +13,18 @@
         <compiler-plugin.version>3.14.1</compiler-plugin.version>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.reporting.outputEncoding
+    >UTF-8</project.reporting.outputEncoding>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
+        <quarkus.platform.group-id
+    >io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.version>3.29.4</quarkus.platform.version>
         <jooq.version>3.19.1</jooq.version>
         <skipITs>true</skipITs>
         <surefire-plugin.version>3.5.4</surefire-plugin.version>
+        <mariadb.version>3.5.2</mariadb.version>
+        <flyway.version>10.20.1</flyway.version>
+        <jooq-codegen.version>3.17.8</jooq-codegen.version>
     </properties>
 
     <dependencyManagement>
@@ -26,6 +35,17 @@
                 <version>${quarkus.platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- Override Flyway versions -->
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-mysql</artifactId>
+                <version>${flyway.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -88,10 +108,11 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-flyway</artifactId>
         </dependency>
+        <!-- Add flyway-mysql for MariaDB support -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
-            <version>10.20.1</version>
+            <version>${flyway.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkiverse.jooq</groupId>
@@ -113,12 +134,6 @@
             <artifactId>uuid-creator</artifactId>
             <version>5.3.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq-meta-extensions</artifactId>
-            <version>3.17.8</version>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -139,6 +154,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${compiler-plugin.version}</version>
@@ -146,24 +162,28 @@
                     <parameters>true</parameters>
                 </configuration>
             </plugin>
+
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire-plugin.version}</version>
                 <configuration>
                     <systemPropertyVariables>
-                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                        <java.util.logging.manager
+            >org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+
+            <!-- jOOQ Codegen Plugin -->
             <plugin>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
-                <version>3.17.8</version>
+                <version>${jooq-codegen.version}</version>
                 <executions>
                     <execution>
                         <id>generate-jooq</id>
-                        <phase>none</phase> <!-- Skip by default, run manually: mvn jooq-codegen:generate -->
+                        <phase>none</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -173,32 +193,34 @@
                     <jdbc>
                         <driver>org.mariadb.jdbc.Driver</driver>
                         <url>jdbc:mariadb://localhost:3307/searchdb</url>
-                        <user>root</user>
-                        <password>root</password>
+                        <user>search_user</user>
+                        <password>SearchUserPass123!</password>
                     </jdbc>
                     <generator>
                         <database>
                             <name>org.jooq.meta.mariadb.MariaDBDatabase</name>
                             <includes>.*</includes>
                             <inputSchema>searchdb</inputSchema>
+                            <excludes>flyway_schema_history</excludes>
                         </database>
                         <generate>
-                            <daos>false</daos>
-                            <pojos>false</pojos>
+                            <daos>true</daos>
+                            <pojos>true</pojos>
                             <fluentSetters>true</fluentSetters>
                             <javaTimeTypes>true</javaTimeTypes>
                         </generate>
                         <target>
-                            <packageName>github.fekom.search.generated.jooq</packageName>
-                            <directory>src/main/java</directory>
+                            <packageName
+              >github.fekom.search.generated.jooq</packageName>
+                            <directory>target/generated-sources/jooq</directory>
                         </target>
                     </generator>
                 </configuration>
                 <dependencies>
                     <dependency>
-                        <groupId>org.jooq</groupId>
-                        <artifactId>jooq-meta-extensions</artifactId>
-                        <version>3.17.8</version>
+                        <groupId>org.mariadb.jdbc</groupId>
+                        <artifactId>mariadb-java-client</artifactId>
+                        <version>${mariadb.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -216,11 +238,33 @@
                 </executions>
                 <configuration>
                     <systemPropertyVariables>
-                        <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
-                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                        <native.image.path
+            >${project.build.directory}/${project.build.finalName}-runner</native.image.path>
+                        <java.util.logging.manager
+            >org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
                     </systemPropertyVariables>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>target/generated-sources/jooq</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -238,6 +282,28 @@
                 <skipITs>false</skipITs>
                 <quarkus.native.enabled>true</quarkus.native.enabled>
             </properties>
+        </profile>
+
+        <profile>
+            <id>generate-jooq</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jooq</groupId>
+                        <artifactId>jooq-codegen-maven</artifactId>
+                        <version>${jooq-codegen.version}</version>
+                        <executions>
+                            <execution>
+                                <id>generate-jooq</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

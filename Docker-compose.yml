@@ -90,6 +90,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
+    command: --bind-address=0.0.0.0
 
   postgres:
     image: postgres:alpine
@@ -177,7 +178,6 @@ services:
       retries: 3
       start_period: 60s
 
-
   user-service:
     build:
       context: ./user
@@ -224,7 +224,6 @@ services:
   #   depends_on:
   #     - catalog
   #     - search
-
 
   # === OBSERVABILIDADE ===
 
